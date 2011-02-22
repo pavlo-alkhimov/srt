@@ -1,4 +1,4 @@
-;;;; -*- Mode: lisp; indent-tabs-mode: nil -*-
+;; -*- mode: lisp; indent-tabs-mode: nil -*-
 
 (defsystem srt
   :description "Sandbox RayTracer."
@@ -12,6 +12,7 @@
             :components
             ((:file "packages")
              (:file "base-types")
+             (:file "debug")
              (:file "aabb")
              (:file "kd-tree")
              (:file "kd-tree-impl")))
