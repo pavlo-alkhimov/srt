@@ -1,12 +1,5 @@
 (in-package #:kd)
 
-(defparameter *kd-dbg-level* 0)
-
-(defmacro ifdebug (level &rest body)
-  `(when (and (numberp *kd-dbg-level*)
-              (<= ,level *kd-dbg-level*))
-     ,@body))
-
 (defun sah (aabb axis-index)
   "DRAFT(to test BUILD-KD): Splits the space taken by TRIANGLES by axis \"BY\" and returns the position."
   (let ((div-position  (+ 0.25 (random 0.5)))) 

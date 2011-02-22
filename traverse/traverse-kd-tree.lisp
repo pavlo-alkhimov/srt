@@ -1,7 +1,6 @@
 (in-package #:kd)
 
 (defun intersection-of-aabb-with-ray (aabb ray)
-  "RAY is an array [2 3] coordinates: the vector \"from\" and the vector \"direction\". "
   (declare (optimize (debug 3)))
   (let* ((x (aref ray 0 0))
          (y (aref ray 0 1))
@@ -43,23 +42,15 @@
                       (setf z0 (- z1))   ;; !!! 0 -> 1
                       (setf z1 (- z0)))) ;; !!! 1 -> 0
          (result (case method
-                   (:x-line (when (and (<= y0 y y1)
-                                       (<= z0 z z1)
-                                       (<= x x0))
+                   (:x-line (when (and (<= y0 y y1) (<= z0 z z1) (<= x x0))
                               (list x0 y z)))
-                   (:y-line (when (and (<= x0 x x1)
-                                       (<= z0 z z1)
-                                       (<= y y0))
+                   (:y-line (when (and (<= x0 x x1) (<= z0 z z1) (<= y y0))
                               (list x y0 z)))
-                   (:z-line (when (and (<= x0 x x1)
-                                       (<= y0 y y1)
-                                       (<= z z0))
+                   (:z-line (when (and (<= x0 x x1) (<= y0 y y1) (<= z z0))
                               (list x y z0)))
                    (:xy-plane (let* ((t-from-x (/ (- x0 x) dx))
                                      (t-from-y (/ (- y0 y) dy)))
-                                (when (and (<= 0.0 t-from-x)
-                                           (<= 0.0 t-from-y)
-                                           (<= z0 z z1))
+                                (when (and (<= 0.0 t-from-x) (<= 0.0 t-from-y) (<= z0 z z1))
                                   (let* ((x-hit (+ x (* dx t-from-y)))
                                          (y-hit (+ y (* dy t-from-x))))
                                     (if (<= x0 x-hit x1)
@@ -70,9 +61,7 @@
                                      (t-from-z (/ (- z0 z) dz))
                                      (x-hit (+ x (* dx t-from-z)))
                                      (z-hit (+ z (* dz t-from-x))))
-                                (when (and (<= 0.0 t-from-x)
-                                           (<= 0.0 t-from-z) 
-                                           (<= y0 y y1))
+                                (when (and (<= 0.0 t-from-x) (<= 0.0 t-from-z) (<= y0 y y1))
                                   (if (<= x0 x-hit x1)
                                       (list x-hit y z0)
                                       (when (<= z0 z-hit z1)
@@ -81,46 +70,38 @@
                                      (t-from-z (/ (- z0 z) dz))
                                      (y-hit (+ y (* dy t-from-z)))
                                      (z-hit (+ z (* dz t-from-y))))
-                                (when (and (<= 0.0 t-from-y)
-                                           (<= 0.0 t-from-z)
-                                           (<= x0 x x1))
+                                (when (and (<= 0.0 t-from-y) (<= 0.0 t-from-z) (<= x0 x x1))
                                   (if (<= y0 y-hit y1)
                                       (list x y-hit z0)
                                       (when (<= z0 z-hit z1)
                                         (list x y0 z-hit))))))
-                   (:arbitrary (let* ((te (/ (- x0 x) dx)) ;; hit YZ plane at x = x0
+                   (:arbitrary (let* ((te (/ (- x0 x))) ;; hit YZ plane at x = x0 dx
                                       (y-res (+ y (* dy te)))
                                       (z-res (+ z (* dz te))))
-                                 (if (and (<= 0.0 te)
-                                          (<= y0 y-res y1)
-                                          (<= z0 z-res z1))
+                                 (if (and (<= 0.0 te) (<= y0 y-res y1) (<= z0 z-res z1))
                                      (list x0 y-res z-res)
                                      (let* ((te (/ (- y0 y) dy)) ;; hit XZ plane at y = y0
                                             (x-res (+ x (* dx te)))
                                             (z-res (+ z (* dz te))))
-                                       (if (and (<= 0.0 te)
-                                                (<= x0 x-res x1)
-                                                (<= z0 z-res z1))
+                                       (if (and (<= 0.0 te) (<= x0 x-res x1) (<= z0 z-res z1))
                                            (list x-res y0 z-res)
                                            (let* ((te (/ (- z0 z) dz)) ;; hit XY plane at z = z0
                                                   (x-res (+ x (* dx te)))
                                                   (y-res (+ y (* dy te))))
-                                             (when (and (<= 0.0 te)
-                                                        (<= x0 x-res x1)
-                                                        (<= y0 y-res y1))
-                                               (list x-res y-res z0)))))))))))
-    (when result
-      (when flipped-x
-        (setf (nth 0 result) (- (nth 0 result))))
-      (when flipped-y
-        (setf (nth 1 result) (- (nth 1 result))))
-      (when flipped-z
-        (setf (nth 2 result) (- (nth 2 result)))))
-    (values result
-            method
-            (when flipped-x :flipped-x)
-            (when flipped-y :flipped-y)
-            (when flipped-z :flipped-z))))
+                                             (when (and (<= 0.0 te) (<= x0 x-res x1) (<= y0 y-res y1))
+                                               (list x-res y-res z0))))))))))))
+  (when result
+    (when flipped-x
+      (setf (nth 0 result) (- (nth 0 result))))
+    (when flipped-y
+      (setf (nth 1 result) (- (nth 1 result))))
+    (when flipped-z
+      (setf (nth 2 result) (- (nth 2 result)))))
+  (values result
+          method
+          (when flipped-x :flipped-x)
+          (when flipped-y :flipped-y)
+          (when flipped-z :flipped-z)))
 
 (defun intersection-of-split-with-ray (&key aabb ray axis-index split point)
   (declare (optimize (debug 3))
@@ -137,15 +118,11 @@
             (values point
                     :in-plane)
             (values point
-                    (if (> 0.0 d)
-                        :R
-                        :L)))
+                    (if (> 0.0 d) :R :L)))
         ;; is RAY outgoing?
         (if (< 0.0 (* (- p split) d))
             (values point
-                    (if (> 0.0 d)
-                        :R
-                        :L))
+                    (if (> 0.0 d) :R :L))
             (let* ((hit (let* ((te (/ (- split
                                          (aref ray 0 axis-index))
                                       d)))
@@ -166,9 +143,7 @@
                          (<= y0 y y1)
                          (<= z0 z z1))
                 (values hit
-                        (if (> 0.0 d)
-                            :RL
-                            :LR))))))))
+                        (if (> 0.0 d) :RL :LR))))))))
 
 (defun test ()
   (let* ((aabb1 (make-instance 'aabb
@@ -189,7 +164,7 @@
         (values a b point method fx fy fz)))))
 
 (defun test2 ()
-  (let* ((p (load-patch "d:/Paul.revised//git.repos//github//slrt//dodecahedron.obj"))
+  (let* ((p (load-patch "d:/Paul.revised//git.repos//github//srt//data//dodecahedron.obj"))
          (k (build-tree p :aabb (corners (aabb p))))
          (r (make-array '(2 3)
                         :element-type 'coordinate
@@ -220,18 +195,17 @@
                                      :point point)))))
 
 (defun intersection-of-kd-with-ray (node aabb ray &key (axis-index 0) (point nil))
-  (when node
-    (if (and (l node)
-             (not (r node)))
-        (progn
-          (format t "Leaf split by ~a, with ~a triangles is visited.~%" (case (mod (1- axis-index) 3)
-                                                                          (0 'x) (1 'y) (2 'z)) 
-                  (length (l node)))
-          nil)
-        (let ((next-axis (mod (1+ axis-index) 3)))
-          (multiple-value-bind (l-aabb r-aabb)
-              (split-aabb aabb :axis axis-index :position (split-position node))
-            (format t "Entering the leaf split by ~a~%" (case (mod axis-index 3) (0 'x) (1 'y) (2 'z)))
-            (or (intersection-of-kd-with-ray (l node) l-aabb ray :axis-index next-axis :point point)
-                (intersection-of-kd-with-ray (r node) r-aabb ray :axis-index next-axis :point point))
-            (format t "Leaving the leaf split by ~a~%" (case (mod axis-index 3) (0 'x) (1 'y) (2 'z))))))))
+  (and node 
+       (if (and (l node)
+                (not (r node)))
+           (progn
+             (format t "Leaf with ~a triangles is visited.~%" (length (l node)))
+             :maybe-triangle-is-hit)
+           (let ((next-axis (mod (1+ axis-index) 3)))
+             (multiple-value-bind (l-aabb r-aabb)
+                 (split-aabb aabb :axis axis-index :position (split-position node))
+               (format t "Entering the leaf split by ~a~%" (case (mod axis-index 3) (0 'x) (1 'y) (2 'z)))
+               (or (intersection-of-kd-with-ray (l node) l-aabb ray :axis-index next-axis :point point)
+                   (intersection-of-kd-with-ray (r node) r-aabb ray :axis-index next-axis :point point))
+               (format t "Leaving the leaf split by ~a~%" (case (mod axis-index 3) (0 'x) (1 'y) (2 'z))))))))
+
