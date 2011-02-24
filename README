@@ -2,6 +2,4 @@
 
 * Tasks
 ** TODO KD-Tree traversal
-*** DONE AABB-Ray intersection.                                   :traversal:
-*** DONE Ray-Split intersection                                   :traversal:
 *** TODO TA-B-rec algorithm
