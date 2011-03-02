@@ -1,5 +1,12 @@
 (in-package #:kd)
 
+(defun get-coord-by-indexes (patch triangle vertex axis)
+  (aref (slot-value patch 'vertexes)
+        (aref (slot-value patch 'indexes)
+              triangle
+              vertex)
+        axis))
+
 (defmethod initialize-instance :after ((patch tri-patch) &key vertexes indexes)
   (let* ((vx-len (length vertexes))
          (ix-len (length indexes))) 
@@ -7,7 +14,7 @@
           (make-array (list vx-len 3)
                       :element-type 'coordinate
                       :adjustable nil))
-    (setf (slot-value  patch 'indexes) 
+    (setf (slot-value  patch 'indexes)
           (make-array (list ix-len 3)
                       :element-type 'index-type
                       :adjustable nil))

@@ -7,6 +7,12 @@
        (* div-position (- (nth (+ 3 axis-index) aabb)
                           (nth axis-index aabb))))))
 
+(defun touches-triangle (patch triangle axis-index split-position predicate)
+  (iter (for i from 0 to 2)
+        (always (funcall predicate
+                         (get-coord-by-indexes patch triangle i axis-index)
+                         split-position))))
+
 (defun build-tree (patch &key
                    (aabb nil aabb-setp)
                    (axis-index 0)
@@ -93,6 +99,6 @@
                  (l tree))
             (length (l tree))
             (list ;; (/ (round (* 100 (split-position tree))) 100.0)
-                  (case axis (0 :x) (1 :y) (2 :z))
-                  (tree-statistics (l tree) :axis next-axis)
-                  (tree-statistics (r tree) :axis next-axis))))))
+             (case axis (0 :x) (1 :y) (2 :z))
+             (tree-statistics (l tree) :axis next-axis)
+             (tree-statistics (r tree) :axis next-axis))))))
