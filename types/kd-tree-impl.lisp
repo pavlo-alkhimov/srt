@@ -86,10 +86,6 @@
             (make-instance 'kd-node :l triangles-list))
           nil)))
 
-;; (defparameter *a* (obj:load-patch "d:/Paul.revised/git.repos/github/gourd.obj"))
-;; (defparameter *b* (srt-kd:build-tree *a*))
-;; (srt-kd:tree-statistics *b*)
-
 (defun tree-statistics (tree &key (axis 0))
   (declare (type kd-node))
   (let ((next-axis (mod (1+ axis) 3)))

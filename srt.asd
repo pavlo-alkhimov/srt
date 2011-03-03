@@ -29,5 +29,10 @@
    (:module traverse
             :depends-on (patch)
             :components
-            ((:file "traverse-kd-tree")))))
+            ((:file "traverse-kd-tree")))
+   (:module tests
+            :depends-on (obj traverse)
+            :components
+            ((:file "init-tests")
+             (:file "kd-build")))))
 
