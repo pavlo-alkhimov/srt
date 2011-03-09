@@ -38,7 +38,6 @@
                      (safety 3)))
   (multiple-value-bind (intersection a b)
       (ray-box-intersect ray aabb)
-    (break)
     (if (not intersection)
         *nowhere*
         
@@ -53,28 +52,27 @@
                farChild
                (te 0.0))
           ;; Init stack:
-          (break)
           (dotimes (i *kd-stack-length*)
             (setf (aref stack i)
                   (make-instance 'stack-element)))
-          (break)
+          
           (setf (slot-value (aref stack enPt) 'te)
                 a)
           (if (>= a 0.0)
               (set-pb enPt a)
-              (set-pb enPt nil))
-          (break)
+              (set-pb enPt))
+          
           (setf (slot-value (aref stack exPt) 'te)
                 b)
           (set-pb exPt b)
           (setf (slot-value (aref stack exPt) 'node)
                 *nowhere*)
-          (break)
+          
           (iter outer-traverser
                 (until (eq currNode *nowhere*))
-                (break)
+                
                 (iter (until (is-leaf currNode))
-                      (break)
+                      
                       (setf splitVal (slot-value currNode 'split-position))
                       (setf axis (slot-value currNode 'split-axis))
                       (setf nextAxis (next-axis axis))
@@ -84,7 +82,7 @@
                                     axis)
                               splitVal)
                           (progn
-                            (break)
+                            
                             (if (<= (aref (slot-value (aref stack exPt) 'pb)
                                           axis)
                                     splitVal)
@@ -97,9 +95,9 @@
                                 (next-iteration))
                             (setf farChild (slot-value currNode 'right))
                             (setf currNode (slot-value currNode 'left))
-                            (break))
+                            )
                           (progn
-                            (break)
+                            
                             (if (< splitVal
                                    (aref (slot-value (aref stack exPt) 'pb)
                                          axis))
@@ -107,7 +105,7 @@
                                 (next-iteration))
                             (setf farChild (slot-value currNode 'left))
                             (setf currNode (slot-value currNode 'right))
-                            (break)))
+                            ))
                       
                       (setf te (/ (- splitVal (aref ray 0 axis))
                                   (aref ray 1 axis)))
@@ -117,7 +115,7 @@
                         (if (= exPt enPt)
                             (setf exPt (1+ exPt)))
                         
-                        (break)
+                        
                         
                         (with-slots ((prev1 prev) (te1 te) (node1 node) (pb1 pb))
                             (aref stack exPt)
@@ -132,7 +130,7 @@
                         
                         ;; intersect ray with each object in the object list, discarding
                         ;; those lying before stack[enPt].t or farther than stack[exPt].t
-                        (break)
+                        
                         (if nil
                             (return-from outer-traverser :object-is-found))
                         
@@ -140,7 +138,7 @@
                         
                         (setf currNode (slot-value (aref stack exPt) 'node))
                         (setf exPt (slot-value (aref stack enPt) 'prev)))
-                      (break)
+                      
                       (return :no-object)))))))
 
 

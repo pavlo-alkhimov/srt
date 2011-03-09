@@ -12,6 +12,6 @@
    (aabb :accessor aabb
          :type aabb
          :initform (make-instance 'aabb))
-   (tree :accessor tree
+   (kd-tree-root :accessor kd-tree-root
          :type kd-node
          :initform nil)))

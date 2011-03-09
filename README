@@ -1,5 +1,12 @@
 ;; -*- mode: org; indent-tabs-mode: nil -*-
 
-* Tasks
-** TODO KD-Tree traversal
-*** TODO TA-B-rec algorithm
+Tasks
+
+* DONE Build KD-tree
+** DONE Implement
+** DONE Test 
+* TODO KD-Tree traversal
+** DONE TA-B-rec algorithm
+** TODO Test the TA-B-rec algorithm
+* TODO ORG-mode
+* TODO Emacs lisp text processing basics

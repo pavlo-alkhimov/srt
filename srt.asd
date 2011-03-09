@@ -7,12 +7,15 @@
   :licence "BSD"
   :depends-on (:cl-ppcre :parse-number)
   :components
-  ((:module types
+  ((:module debug
+            :serial t
+            :components
+            ((:file "debug")))
+   (:module types (debug) 
             :serial t
             :components
             ((:file "packages")
              (:file "base-types")
-             (:file "debug")
              (:file "aabb")
              (:file "kd-tree")
              (:file "kd-tree-impl")))
@@ -34,5 +37,6 @@
             :depends-on (obj traverse)
             :components
             ((:file "init-tests")
-             (:file "kd-build")))))
+             (:file "kd-build")
+             (:file "kd-traverse")))))
 

@@ -46,8 +46,9 @@
              when (touches-triangle patch triangle axis-index split-position #'<)
              do (progn (push triangle l-triangles)
                        (incf l-count)))
-
-          (ifdebug 3 (format t "l: ~a, r: ~a~%" l-count r-count))
+          
+          (ifdebug 3
+                   (format t "l: ~a, r: ~a~%" l-count r-count))
           
           ;; call recursively or put everything here
           (if (and (< 0 l-count)
@@ -58,7 +59,7 @@
               ;; recursion
               (let ((next-axis (mod (1+ axis-index) 3))
                     (next-depth (1+ depth)))
-
+                
                 (ifdebug 3
                          (format t "DBG REC at #~a:~a [~a]=[~a]+[~a]~%"
                                  depth axis-index triangles-count l-count r-count)
@@ -66,7 +67,9 @@
                            (format t "DBG At depth ~a: ~a + ~a -> intersect of ~a triangles~%"
                                    depth l-count r-count  (- (+ l-count r-count) triangles-count))))
                 
-                (make-instance 'kd-node :split-position split-position
+                (make-instance 'kd-node
+                               :split-position split-position
+                               :split-axis axis-index
                                :l (build-tree patch :aabb l-aabb :axis-index next-axis
                                               :depth next-depth :max-depth max-depth
                                               :triangles-list l-triangles :triangles-count l-count)
@@ -95,6 +98,6 @@
                  (l tree))
             (length (l tree))
             (list ;; (/ (round (* 100 (split-position tree))) 100.0)
-             (case axis (0 :x) (1 :y) (2 :z))
+             (split-axis tree)
              (tree-statistics (l tree) :axis next-axis)
              (tree-statistics (r tree) :axis next-axis))))))
