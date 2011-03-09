@@ -7,15 +7,18 @@
   :licence "BSD"
   :depends-on (:cl-ppcre :parse-number)
   :components
-  ((:module debug
-            :serial t
+  ((:module packages
+            :components
+            ((:file "packages")))
+   (:module debug
+            :depends-on (packages)
             :components
             ((:file "debug")))
-   (:module types (debug) 
+   (:module types
+            :depends-on (packages debug) 
             :serial t
             :components
-            ((:file "packages")
-             (:file "base-types")
+            ((:file "base-types")
              (:file "aabb")
              (:file "kd-tree")
              (:file "kd-tree-impl")))
