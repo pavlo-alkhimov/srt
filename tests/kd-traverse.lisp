@@ -6,6 +6,6 @@
 
 
 
-#|(ray-trav-alg-rec-b (slot-value *test-patch* 'kd-tree-root)
+(ray-trav-alg-rec-b (slot-value *test-patch* 'kd-tree-root)
                     (slot-value *test-patch* 'aabb)
-                    (make-array '(2 3) :initial-contents '((0.0 0.0 0.0)(1.0 2.0 3.0))))|#
+                    (make-array '(2 3) :initial-contents '((0.0 0.0 0.0)(1.0 2.0 3.0))))

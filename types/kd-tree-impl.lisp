@@ -47,8 +47,7 @@
              do (progn (push triangle l-triangles)
                        (incf l-count)))
           
-          (ifdebug 3
-                   (format t "l: ~a, r: ~a~%" l-count r-count))
+          (DBGFORMAT "l: ~a, r: ~a~%" l-count r-count)
           
           ;; call recursively or put everything here
           (if (and (< 0 l-count)
@@ -60,12 +59,13 @@
               (let ((next-axis (mod (1+ axis-index) 3))
                     (next-depth (1+ depth)))
                 
-                (ifdebug 3
-                         (format t "DBG REC at #~a:~a [~a]=[~a]+[~a]~%"
-                                 depth axis-index triangles-count l-count r-count)
-                         (when (> (+ l-count r-count) triangles-count)
-                           (format t "DBG At depth ~a: ~a + ~a -> intersect of ~a triangles~%"
-                                   depth l-count r-count  (- (+ l-count r-count) triangles-count))))
+                (DBGEXE
+                 (format t "DBG REC at #~a:~a [~a]=[~a]+[~a]~%"
+                         depth axis-index triangles-count l-count r-count)
+                 
+                 (when (> (+ l-count r-count) triangles-count)
+                   (format t "DBG At depth ~a: ~a + ~a -> intersect of ~a triangles~%"
+                           depth l-count r-count  (- (+ l-count r-count) triangles-count))))
                 
                 (make-instance 'kd-node
                                :split-position split-position
@@ -78,14 +78,14 @@
                                               :triangles-list r-triangles :triangles-count r-count)))
               ;; no recursion: put everything here
               (progn
-                (ifdebug 3 (format t "DBG INT at #~a:~a [~a]=[~a]+[~a]~%"
-                                   depth axis-index triangles-count l-count r-count))
+                (DBGFORMAT "DBG INT at #~a:~a [~a]=[~a]+[~a]~%"
+                           depth axis-index triangles-count l-count r-count)
                 (make-instance 'kd-node :l triangles-list)))))
       ;; we do not recur. Put everything into this node or return nil.
       (if triangles-list
           (progn
-            (ifdebug 3 (format t "DBG FIN at #~a:~a [~a]~%"
-                               depth axis-index triangles-count))
+            (DBGFORMAT "DBG FIN at #~a:~a [~a]~%"
+                       depth axis-index triangles-count)
             (make-instance 'kd-node :l triangles-list))
           nil)))
 

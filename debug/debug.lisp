@@ -1,8 +1,21 @@
 (in-package #:kd)
 
-(defparameter *kd-dbg-level* 0)
+(defparameter *minimal-dbg-level* 2)
+(defparameter *current-dbg-level* 2)
+(defparameter *dbg-prefix* "DEBUG: ")
 
-(defmacro ifdebug (level &rest body)
-  `(when (and (numberp *kd-dbg-level*)
-              (<= ,level *kd-dbg-level*))
+(defmacro DBGMSG (&rest body)
+  `(when (>= *current-dbg-level* *minimal-dbg-level*)
+     (format t "~s ~a~%"
+             *dbg-prefix*
+             ,body)))
+
+(defmacro DBGFORMAT (string &rest body)
+  `(when (>= *current-dbg-level* *minimal-dbg-level*)
+     (format t "~a" *dbg-prefix*)
+     (format t ,string
+             ,@body)))
+
+(defmacro DBGEXE (&rest body)
+  `(when (>= *current-dbg-level* *minimal-dbg-level*)
      ,@body))

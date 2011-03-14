@@ -1,6 +1,6 @@
 (in-package #:kd)
 
-(defparameter *kd-stack-length* 50)
+(defparameter *kd-stack-length* 50) ;; sdfg sdfg sdfg
 (defparameter *nowhere* :no-object)
 
 (defclass stack-element ()
@@ -16,10 +16,12 @@
          :type index-type)))
 
 (defun ray-box-intersect (ray aabb)
-  (declare (ignore aabb)) 
-  (values (aref ray 0 1)
-          (- (random 1.0) 0.5)
-          (- (random 1.0) 0.5)))
+  (declare (ignore aabb))
+  (let* ((aaa (random 0.5))
+         (bbb (+ aaa (random 0.5)))) 
+    (return-from ray-box-intersect
+      (values (aref ray 0 1)
+              aaa bbb))))
 
 (defmacro set-pb (place &optional amount)
   (if amount
@@ -35,20 +37,20 @@
 (defun ray-trav-alg-rec-b (root aabb ray)
   "Recursive ray traversal algorithm."
   (declare (optimize (debug 3)
-                     (safety 3)))
+                     (safety 3)
+                     (speed 0))) 
   (multiple-value-bind (intersection a b)
       (ray-box-intersect ray aabb)
+    ;; (break "~a" (list intersection a b))
     (if (not intersection)
         *nowhere*
         
         (let* ((stack (make-array *kd-stack-length*))
                (currNode root)
-               (enPt 0)
-               (exPt 1)
+               (enPt 0) (exPt 1)
                (splitVal 0.0)
                (axis 0)
-               (nextAxis 0)
-               (prevAxis 0)
+               (nextAxis 0) (prevAxis 0)
                farChild
                (te 0.0))
           ;; Init stack:
@@ -78,35 +80,52 @@
                       (setf nextAxis (next-axis axis))
                       (setf prevAxis (prev-axis axis))
                       
+                      (break "currNode=~a (~:[node~;leaf~])~%axis=~a~%prev=~a~%next=~a"
+                             currNode
+                             (is-leaf currNode)
+                             axis
+                             prevAxis
+                             nextAxis)
+                      
                       (if (<= (aref (slot-value (aref stack enPt) 'pb)
                                     axis)
                               splitVal)
                           (progn
-                            
                             (if (<= (aref (slot-value (aref stack exPt) 'pb)
                                           axis)
                                     splitVal)
-                                (setf currNode (slot-value currNode 'left))
-                                (next-iteration))
+                                (progn
+                                  (if (equalp currNode (slot-value currNode 'left))
+                                      (break "WILL FAIL!!!"))
+                                  (setf currNode (slot-value currNode 'left))
+                                  (next-iteration)))
+                            ;; (break "passed 1")
                             (if (= (aref (slot-value (aref stack exPt) 'pb)
                                          axis)
                                    splitVal)
-                                (setf currNode (slot-value currNode 'right))
-                                (next-iteration))
+                                (progn
+                                  (if (equalp currNode (slot-value currNode 'right))
+                                      (break "WILL FAIL!!!"))
+                                  (setf currNode (slot-value currNode 'right))
+                                  (next-iteration)))
+                            ;; (break "passed 2")
                             (setf farChild (slot-value currNode 'right))
-                            (setf currNode (slot-value currNode 'left))
-                            )
-                          (progn
-                            
+                            (setf currNode (slot-value currNode 'left)))
+                          
+                          (progn 
+                            ;; (break "1if 2 a")
                             (if (< splitVal
                                    (aref (slot-value (aref stack exPt) 'pb)
                                          axis))
-                                (setf currNode (slot-value currNode 'right))
-                                (next-iteration))
+                                (progn
+                                  (if (equalp currNode (slot-value currNode 'right))
+                                      (break "WILL FAIL!!!"))
+                                  (setf currNode (slot-value currNode 'right))
+                                  (next-iteration)))                            
+                            ;; (break "1if 2 b")
                             (setf farChild (slot-value currNode 'left))
-                            (setf currNode (slot-value currNode 'right))
-                            ))
-                      
+                            (setf currNode (slot-value currNode 'right))))                      
+                      ;; (break "after if")
                       (setf te (/ (- splitVal (aref ray 0 axis))
                                   (aref ray 1 axis)))
                       
@@ -114,8 +133,6 @@
                         (setf exPt (1+ exPt))
                         (if (= exPt enPt)
                             (setf exPt (1+ exPt)))
-                        
-                        
                         
                         (with-slots ((prev1 prev) (te1 te) (node1 node) (pb1 pb))
                             (aref stack exPt)
@@ -134,10 +151,14 @@
                         (if nil
                             (return-from outer-traverser :object-is-found))
                         
+                        (princ "after return.")
+                        
                         (setf enPt exPt)
                         
                         (setf currNode (slot-value (aref stack exPt) 'node))
                         (setf exPt (slot-value (aref stack enPt) 'prev)))
+                      
+                      (princ "after iter.")
                       
                       (return :no-object)))))))
 
