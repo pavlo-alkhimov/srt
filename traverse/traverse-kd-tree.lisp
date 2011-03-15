@@ -4,7 +4,7 @@
 (defparameter *nowhere* :no-object)
 
 (defclass stack-element ()
-  ((node :type kd-node
+  ((node :type (or kd-node :no-object)
          :initform *default-nil-node*)
    (te :initform 0.0
        :type coordinate)
@@ -124,7 +124,7 @@
                                   (next-iteration)))                            
                             ;; (break "1if 2 b")
                             (setf farChild (slot-value currNode 'left))
-                            (setf currNode (slot-value currNode 'right))))                      
+                            (setf currNode (slot-value currNode 'right))))
                       ;; (break "after if")
                       (setf te (/ (- splitVal (aref ray 0 axis))
                                   (aref ray 1 axis)))
