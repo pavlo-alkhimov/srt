@@ -10,3 +10,6 @@ Tasks
 ** TODO Test the TA-B-rec algorithm
 * TODO ORG-mode
 * TODO Emacs lisp text processing basics
+* DONE Debugging facilities
+** DONE Printing output
+** DONE Conditional evaluation
