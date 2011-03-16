@@ -3,7 +3,8 @@
   (:use #:cl
         #:iterate
         #:parse-number
-        #:cl-ppcre)
+        #:cl-ppcre
+        #:alexandria)
   (:export
    :coordinate :index-type
    :tri-patch :vertexes :indexes :aabb :tree

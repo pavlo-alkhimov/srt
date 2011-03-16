@@ -5,7 +5,10 @@
   :author "Paul Alkhimov <alkhimov@gmail.com>"
   :version "0.0.1"
   :licence "BSD"
-  :depends-on (:cl-ppcre :parse-number)
+  :depends-on (:cl-ppcre
+               :parse-number
+               :iterate
+               :alexandria)
   :components
   ((:module packages
             :components

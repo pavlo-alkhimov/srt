@@ -6,9 +6,9 @@
                    :accessor split-position
                    :type coordinate)
    (split-axis :initarg :split-axis
-                :initform 0
-                :accessor split-axis
-                :type index-type)
+               :initform 0
+               :accessor split-axis
+               :type index-type)
    (left :initarg :l
          :initform nil
          :accessor l) 
@@ -20,9 +20,12 @@ If a the LEFT has something and the RIGHT is nil,
 it is a leaf and the LEFT has the contents of the leaf.
 Otherwise, it is a node."))
 
-(defparameter *default-nil-node* (make-instance 'kd-node))
-
 (defun is-leaf (node)
+  (DBGMSG 3 "Is-Leaf for ~a is ~a"
+          node
+          (and node
+               (slot-value node 'left)
+               (not (slot-value node 'right))))
   (and node
        (slot-value node 'left)
        (not (slot-value node 'right))))
