@@ -8,7 +8,9 @@
   :depends-on (:cl-ppcre
                :parse-number
                :iterate
-               :alexandria)
+               :alexandria
+               :lispbuilder-sdl
+               :lispbuilder-sdl-gfx)
   :components
   ((:module packages
             :components
@@ -42,7 +44,8 @@
    (:module tests
             :depends-on (obj traverse)
             :components
-            ((:file "init-tests")
+            ((:file "draw-kd-tree")
+             (:file "init-tests")
              (:file "kd-build")
              (:file "kd-traverse")))))
 

@@ -17,7 +17,7 @@
                    (aabb nil aabb-setp)
                    (axis-index 0)
                    (depth 0)
-                   (max-depth 4)
+                   (max-depth 4 m-d-setp)
                    (triangles-list nil triangles-list-setp)
                    (triangles-count -1 triangles-count-setp)
                    (min-triangles-number 3))
@@ -25,7 +25,6 @@
   (if (and (< depth max-depth)
            (or (not triangles-count-setp)
                (< min-triangles-number triangles-count)))
-      ;; try to recur
       (let* ((triangles-list (if (not triangles-list-setp)
                                  (loop for i from 0 below (array-dimension (indexes patch) 0)
                                     collecting i)
@@ -47,27 +46,24 @@
              do (progn (push triangle l-triangles)
                        (incf l-count)))
           
-          (DBGMSG 4
-                  "l: ~a, r: ~a" l-count r-count)
-          
-          ;; call recursively or put everything here
+          ;; (DBGMSG 4 "Call recursively or put everything here")
           (if (and (< 0 l-count)
                    (< 0 r-count)
                    (or (not triangles-count-setp)
                        (and (< l-count triangles-count)
                             (< r-count triangles-count))))
-              ;; recursion
               (let ((next-axis (mod (1+ axis-index) 3))
                     (next-depth (1+ depth)))
-                
                 (DBGEXE 4
-                        (DBGMSG 4 "REC at #~a:~a [~a]=[~a]+[~a]"
+                        (DBGMSG 4 "DEPTH:~A AXIS-INDEX:~A TRIANGLES-COUNT:~A L-COUNT:~A R-COUNT:~A"
                                 depth axis-index triangles-count l-count r-count)
-                        
-                        (when (> (+ l-count r-count) triangles-count)
-                          (DBGMSG 4 "At depth ~a: ~a + ~a -> intersect of ~a triangles"
-                                  depth l-count r-count  (- (+ l-count r-count) triangles-count))))
-                
+                        (let ((difference (- (+ l-count r-count) (if (< triangles-count 0)
+                                                                     (+ l-count r-count)
+                                                                     triangles-count))))
+                          (if (< difference 0)
+                              (DBGMSG 4 "ERROR: ~a TRIANGLES ARE LOST!!!" (- difference))
+                              (DBGMSG 4 "Intersect of ~a triangles" difference))))
+                (DBGMSG 4 "Recursion...")
                 (make-instance 'kd-node
                                :split-position split-position
                                :split-axis axis-index
@@ -77,20 +73,22 @@
                                :r (build-tree patch :aabb r-aabb :axis-index next-axis
                                               :depth next-depth :max-depth max-depth
                                               :triangles-list r-triangles :triangles-count r-count)))
-              ;; no recursion: put everything here
               (progn
-                (DBGMSG 4
-                        "INT at #~a:~a [~a]=[~a]+[~a]"
+                (DBGMSG 4 "No recursion. The leaf is created. DEPTH:~A AXIS-INDEX:~A TRIANGLES-COUNT:~A L-COUNT:~A R-COUNT:~A"
                         depth axis-index triangles-count l-count r-count)
                 (make-instance 'kd-node :l triangles-list)))))
-      ;; we do not recur. Put everything into this node or return nil.
-      (if triangles-list
-          (progn
-            (DBGMSG 4
-                    "FIN at #~a:~a [~a]"
-                    depth axis-index triangles-count)
-            (make-instance 'kd-node :l triangles-list))
-          nil)))
+      (progn
+        (when (not (< depth max-depth))
+          )
+        (if triangles-list
+            (progn
+              (DBGMSG 4 "Hit DEPTH:~A limit. The leaf is created. MAX-DEPTH:~A MIN-TRI-NUM:~A TRI-COUNT:~a"
+                      depth max-depth
+                      min-triangles-number triangles-count)
+              (make-instance 'kd-node :l triangles-list))
+            (progn
+              (DBGMSG 4 "Hit DEPTH:~A limit]. TRIANGLES-LIST: nil." depth)
+              nil)))))
 
 (defun tree-statistics (tree &key (axis 0))
   (declare (type kd-node))

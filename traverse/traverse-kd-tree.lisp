@@ -98,7 +98,7 @@
                   (until (eq currNode *nowhere*))
                   (DBGMSG 3 "Entering inner loop")
                   (iter
-                   (until (is-leaf currNode))
+                    (until (is-leaf currNode))
                    
                    (setf splitVal (slot-value currNode 'split-position))
                    (setf axis (slot-value currNode 'split-axis))
@@ -169,8 +169,8 @@
                        (setf (aref pb1 prevAxis)
                              (+ (aref ray 0 prevAxis) (* te (aref ray 1 prevAxis)))))))
                   
-                  ;; intersect ray with each object in the object list, discarding
-                  ;; those lying before stack[enPt].t or farther than stack[exPt].t
+                  (DBGMSG 3 "Intersect ray with each object in the object list, discarding")
+                  (DBGMSG 3 "those lying before stack[enPt].t or farther than stack[exPt].t")
                   
                   (if nil
                       (return-from outer-traverser :object-is-found))

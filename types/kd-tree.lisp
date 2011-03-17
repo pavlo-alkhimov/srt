@@ -21,7 +21,7 @@ it is a leaf and the LEFT has the contents of the leaf.
 Otherwise, it is a node."))
 
 (defun is-leaf (node)
-  (DBGMSG 3 "Is-Leaf for ~a is ~a"
+  (DBGMSG 4 "(is-leaf ~a) => ~a"
           node
           (and node
                (slot-value node 'left)
