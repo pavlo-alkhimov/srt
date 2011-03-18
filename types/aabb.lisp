@@ -25,7 +25,7 @@ CORNERS are represented as list (x0 y0 z0 x1 y1 z1)"))
                                  maximizing (aref vertexes i 2) into z1
                                  finally (return (list x0 y0 z0 x1 y1 z1))))))
 
-(defun split-aabb (aabb &key axis position)
+(defun split-aabb (&key aabb axis position)
   (let* ((l (copy-tree aabb))
          (r (copy-tree l)))
     (setf (nth (+ axis 3) l)

@@ -1,5 +1,7 @@
 (in-package #:kd)
 
+(SET-debug-level 3)
+
 (let ((result
        (tree-statistics
         (build-tree

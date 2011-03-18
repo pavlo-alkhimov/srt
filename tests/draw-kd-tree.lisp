@@ -17,8 +17,7 @@
     (sdl:with-init ()
       (sdl:window 600 600 :title-caption  "Hit Q or ESC to quit.")
       (setf (sdl:frame-rate) 60)
-      (sdl-gfx:initialise-default-font sdl-gfx:*Font-6x12*)
-      
+      ;; (with-font (font sdl-gfx:*Font-6x12*))
       (sdl:with-events ()
         (:quit-event () t)
         (:key-down-event (:key key)
@@ -35,11 +34,11 @@
                       (right  (elt l 3))
                       (top    (elt l 4))
                       (r (rectangle-from-edges-* left bottom right top))
-
+                      
                       (split-x       (world->screen (split-position (kd-tree-root patch))))
                       (split-y-left  (world->screen (split-position (l (kd-tree-root patch)))))
                       (split-y-right (world->screen (split-position (r (kd-tree-root patch))))))
-
+                 
                  (sdl:with-color (color (sdl:color :r 150 :g 75 :b 0))
                    (iter (for i from 0 below (array-dimension (indexes patch) 0))
                          (sdl:draw-polygon (affine (get-xy-by-triangle-number i)) :aa t))
@@ -55,7 +54,7 @@
                                     (sdl:point :x right   :y split-y-right)))
                    
                    (sdl:draw-rectangle r)))
-                 
+               
                (sdl:update-display))))))
 
 (draw-xy-kd-tree *test-patch*)

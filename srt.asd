@@ -26,6 +26,7 @@
             ((:file "base-types")
              (:file "aabb")
              (:file "kd-tree")
+             (:file "kd-tree-sah")
              (:file "kd-tree-impl")))
    (:module patch
             :depends-on (types)
@@ -44,8 +45,8 @@
    (:module tests
             :depends-on (obj traverse)
             :components
-            ((:file "draw-kd-tree")
-             (:file "init-tests")
+            ((:file "init-tests")
              (:file "kd-build")
-             (:file "kd-traverse")))))
+             (:file "kd-traverse")
+             (:file "draw-kd-tree")))))
 
