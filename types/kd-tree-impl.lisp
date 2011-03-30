@@ -1,85 +1,83 @@
 (in-package #:kd)
 
 
-
-(defun touches-triangle (&key patch triangle axis-index split-position predicate)
+(defun try-triangle (patch triangle axis-index split-position predicate)
   (iter (for i from 0 to 2)
-        (always (funcall predicate
-                         (get-coord-by-indexes patch triangle i axis-index)
-                         split-position))))
+        (thereis (funcall predicate
+                          (get-coord-by-indexes patch triangle i axis-index)
+                          split-position))))
 
-(defun build-tree (patch &key
-                   (aabb nil aabb-setp)
-                   (axis-index 0)
-                   (depth 0)
-                   (max-depth 4 m-d-setp)
-                   (triangles-list nil triangles-list-setp)
-                   (triangles-count -1 triangles-count-setp)
-                   (min-triangles-number 3))
-  (declare (optimize (debug 3)))
-  (if (and (< depth max-depth)
-           (or (not triangles-count-setp)
-               (< min-triangles-number triangles-count)))
-      (let* ((triangles-list (if (not triangles-list-setp)
-                                 (loop for i from 0 below (array-dimension (indexes patch) 0)
-                                    collecting i)
-                                 triangles-list))
-             (aabb (if aabb-setp
-                       aabb
-                       (corners (slot-value patch 'aabb))))
-             (split-position (sah aabb axis-index))
-             l-triangles (l-count 0)
-             r-triangles (r-count 0))
-        (multiple-value-bind (l-aabb r-aabb)
-            (split-aabb :aabb aabb
-                        :axis axis-index
-                        :position split-position)
-          (loop for triangle in triangles-list
-             when (touches-triangle :patch patch :triangle triangle :axis-index axis-index
-                                    :split-position split-position :predicate #'>)
-             do (progn (push triangle r-triangles)
-                       (incf r-count))
-             when (touches-triangle :patch patch :triangle triangle :axis-index axis-index
-                                    :split-position split-position :predicate #'<)
-             do (progn (push triangle l-triangles)
-                       (incf l-count)))
-          (if (and (< 0 l-count)
-                   (< 0 r-count)
-                   (or (not triangles-count-setp)
-                       (and (< l-count triangles-count)
-                            (< r-count triangles-count))))
-              (let ((next-axis (mod (1+ axis-index) 3))
-                    (next-depth (1+ depth)))
-                (DBGEXE 4
-                        (DBGMSG 4 "DEPTH:~A AXIS-INDEX:~A TRIANGLES-COUNT:~A L-COUNT:~A R-COUNT:~A"
-                                depth axis-index triangles-count l-count r-count)
-                        (let ((difference (- (+ l-count r-count) (if (< triangles-count 0)
-                                                                     (+ l-count r-count)
-                                                                     triangles-count))))
-                          (if (< difference 0)
-                              (DBGMSG 4 "ERROR: ~a TRIANGLES ARE LOST!!!" (- difference))
-                              (DBGMSG 4 "Overhead: Intersect of ~a triangles" difference))))
-                (with-dbgmsg 4 ("Recursion.") 
-                             (make-instance 'kd-node
-                                            :split-position split-position
-                                            :split-axis axis-index
-                                            :l (build-tree patch :aabb l-aabb :axis-index next-axis
-                                                           :depth next-depth :max-depth max-depth
-                                                           :triangles-list l-triangles :triangles-count l-count)
-                                            :r (build-tree patch :aabb r-aabb :axis-index next-axis
-                                                           :depth next-depth :max-depth max-depth
-                                                           :triangles-list r-triangles :triangles-count r-count))))
-              (with-dbgmsg 4 ("The leaf is created. DEPTH:~A AXIS-INDEX:~A TRIANGLES-COUNT:~A L-COUNT:~A R-COUNT:~A"
-                              depth axis-index triangles-count l-count r-count)
-                           (make-instance 'kd-node :l triangles-list)))))
-      (if triangles-list
-          (with-dbgmsg 4 ("Hit DEPTH:~A limit. The leaf is created. MAX-DEPTH:~A MIN-TRI-NUM:~A TRI-COUNT:~a"
-                          depth max-depth min-triangles-number triangles-count)
-                       (make-instance 'kd-node :l triangles-list))
-          (with-dbgmsg 4 ("Hit DEPTH:~A limit]. TRIANGLES-LIST: nil." depth)
-                       nil))))
+(defstruct triangle-cached-ref
+  (index 0 :type index-type)
+  (square 0.0 :type coordinate))
 
-(defun tree-statistics (tree &key (axis 0))
+(defun-with-dbg build-tree (patch &key (triangles nil triangles-setp)
+                                  (current-aabb nil current-aabb-setp)
+                                  (axis-index 0)
+                                  (recursion-steps-left 1)
+                                  (min-triangles-count 3))
+  (declare (optimize (debug 3))
+           (type aabb current-aabb))
+  
+  (with-dbg 4 ((dump patch)
+               (dump recursion-steps-left)
+               (dump current-aabb)
+               (dump (slot-value patch 'aabb)))
+            (if (< 0 recursion-steps-left)
+                (with-dbg 4 (("recursion-steps-left: ~a. Trying to recur." recursion-steps-left))
+                          (let* ((current-aabb (if current-aabb-setp
+                                                   current-aabb
+                                                   (slot-value patch 'aabb)))
+                                 
+                                 (split-position (sah patch
+                                                      current-aabb
+                                                      axis-index
+                                                      nil))
+                                 (l-triangles nil)
+                                 (r-triangles nil)
+                                 (triangles (if (not triangles-setp)
+                                                (iter (for x from 0 below (array-dimension (i patch) 0))
+                                                      (collect x))
+                                                triangles))
+                                 (triangles-count (length triangles)))
+                            (iter (for i in triangles)
+                                  (when (try-triangle patch i axis-index split-position #'<)
+                                    (push i l-triangles)) ;; triangle touches left
+                                  (when (try-triangle patch i axis-index split-position #'>)
+                                    (push i r-triangles)) ;; triangle touches right
+                                  (when (not (try-triangle patch i axis-index split-position #'/=))
+                                    (push i l-triangles))) ;; triangle is in-plane
+                            (multiple-value-bind (l-aabb r-aabb)
+                                (split-aabb current-aabb axis-index split-position)
+                              (with-dbg 4 (("Split ~a triangles in two groups" triangles-count)
+                                           (dump (length l-triangles)
+                                                 (length r-triangles))
+                                           (dump split-position))
+                                        (if (and (< 0 (length l-triangles) (length triangles))
+                                                 (< 0 (length r-triangles) (length triangles)))
+                                            (let ((next-axis (mod (1+ axis-index) 3))
+                                                  (recursion-steps-left (1- recursion-steps-left)))
+                                              (with-dbg 4 (("Recursion."))
+                                                        (make-instance 'kd-node
+                                                                       :split-position split-position
+                                                                       :split-axis axis-index
+                                                                       :l (build-tree patch :current-aabb l-aabb :axis-index next-axis
+                                                                                      :recursion-steps-left recursion-steps-left
+                                                                                      :triangles l-triangles)
+                                                                       :r (build-tree patch :current-aabb r-aabb :axis-index next-axis
+                                                                                      :recursion-steps-left recursion-steps-left
+                                                                                      :triangles r-triangles))))
+                                            (with-dbg 4 (("The leaf is created."))
+                                                      (make-instance 'kd-node :l triangles)))))))
+                (with-dbg 4
+                  (("recursion-steps-left: ~a. Not entering build-tree splitter." recursion-steps-left))
+                  (if triangles
+                      (with-dbg 4 (("The leaf is created."))
+                                (make-instance 'kd-node :l triangles))
+                      (with-dbg 4 (("triangles-list: nil."))
+                                nil))))))
+
+(defun-with-dbg tree-statistics (tree &key (axis 0))
   (declare (type kd-node))
   (let ((next-axis (mod (1+ axis) 3)))
     (if (null tree)
@@ -87,7 +85,7 @@
         (if (and (null (r tree))
                  (l tree))
             (length (l tree))
-            (list ;; (/ (round (* 100 (split-position tree))) 100.0)
-             (split-axis tree)
+            (list
+             (a tree)
              (tree-statistics (l tree) :axis next-axis)
              (tree-statistics (r tree) :axis next-axis))))))

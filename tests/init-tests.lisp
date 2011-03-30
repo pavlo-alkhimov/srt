@@ -2,4 +2,4 @@
 
 (defparameter *last-string-to-print* nil)
 
-(DBGMSG 3 "~%~%~%Starting tests...")
+(DBG-MSG 3 "~%~%~%Starting tests...")

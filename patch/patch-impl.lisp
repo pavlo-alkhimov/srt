@@ -7,6 +7,14 @@
               vertex)
         axis))
 
+(defmethod print-object ((obj tri-patch) stream)
+  (print-unreadable-object (obj stream :type t :identity t)
+    (with-accessors ((v v) (i i) (a a) (k k)) obj
+      (let* ((vs (array-dimension v 0))
+             (is (array-dimension i 0)))
+       (format stream "v[~a] i[~a] ~a Kd:~a"
+               vs is a k)))))
+
 (defmethod initialize-instance :after ((patch tri-patch) &key vertexes indexes)
   (let* ((vx-len (length vertexes))
          (ix-len (length indexes))) 
