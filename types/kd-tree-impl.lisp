@@ -7,10 +7,6 @@
                           (get-coord-by-indexes patch triangle i axis-index)
                           split-position))))
 
-(defstruct triangle-cached-ref
-  (index 0 :type index-type)
-  (square 0.0 :type coordinate))
-
 (defun-with-dbg build-tree (patch &key (triangles nil triangles-setp)
                                   (current-aabb nil current-aabb-setp)
                                   (axis-index 0)
@@ -22,31 +18,32 @@
   (with-dbg 4 ((dump patch)
                (dump recursion-steps-left)
                (dump current-aabb)
-               (dump (slot-value patch 'aabb)))
+               (dump (patch-aabb patch)))
             (if (< 0 recursion-steps-left)
                 (with-dbg 4 (("recursion-steps-left: ~a. Trying to recur." recursion-steps-left))
                           (let* ((current-aabb (if current-aabb-setp
                                                    current-aabb
-                                                   (slot-value patch 'aabb)))
-                                 
+                                                   (patch-aabb patch)))
                                  (split-position (sah patch
                                                       current-aabb
                                                       axis-index
                                                       nil))
-                                 (l-triangles nil)
-                                 (r-triangles nil)
                                  (triangles (if (not triangles-setp)
-                                                (iter (for x from 0 below (array-dimension (i patch) 0))
+                                                (iter (for x from 0 below (array-dimension (patch-vis patch) 0))
                                                       (collect x))
                                                 triangles))
-                                 (triangles-count (length triangles)))
-                            (iter (for i in triangles)
-                                  (when (try-triangle patch i axis-index split-position #'<)
-                                    (push i l-triangles)) ;; triangle touches left
-                                  (when (try-triangle patch i axis-index split-position #'>)
-                                    (push i r-triangles)) ;; triangle touches right
-                                  (when (not (try-triangle patch i axis-index split-position #'/=))
-                                    (push i l-triangles))) ;; triangle is in-plane
+                                 (triangles-count (length triangles))
+                                 l-triangles
+                                 r-triangles)
+                            (with-dbg 4 ((dump triangles-count
+                                               triangles))
+                                      (iter (for i in triangles)
+                                            (when (try-triangle patch i axis-index split-position #'<)
+                                              (push i l-triangles)) ;; triangle touches left
+                                            (when (try-triangle patch i axis-index split-position #'>)
+                                              (push i r-triangles)) ;; triangle touches right
+                                            (when (not (try-triangle patch i axis-index split-position #'/=))
+                                              (push i l-triangles)))) ;; triangle is in-plane
                             (multiple-value-bind (l-aabb r-aabb)
                                 (split-aabb current-aabb axis-index split-position)
                               (with-dbg 4 (("Split ~a triangles in two groups" triangles-count)

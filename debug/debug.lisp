@@ -28,7 +28,7 @@
            (let ((*current-block* ',name))
              ,@body)))))
 
-(defun trimmer (string &key (max-len 70))
+(defun trimmer (string &key (max-len 50))
   (if (> (length string) max-len)
       (let ((res (concatenate 'string
                               (subseq string 0 max-len)
@@ -80,7 +80,13 @@
       `(,(reduce #'(lambda (x y) (concatenate 'string x y))
                  (mapcar #'(lambda(i) (string-downcase (format nil "~a:~~a  " i)))
                          variables))
-         ,@variables)))
+         ,@(mapcar #'(lambda (x)
+                       `(if (and (listp ,x)
+                                 (numberp (car ,x))
+                                 (< 2 (length ,x)))
+                            (format nil "(~a ~a ~a ...[~a total])" (first ,x) (second ,x) (third ,x) (length ,x))
+                            ,x))
+                   variables))))
 
 (defmacro with-dbg (level format-group &rest body)
   "Produces a debug output, executes the form and outputs the result.

@@ -34,6 +34,7 @@
 (defun load-patch (filename)
   (let* ((data (parse-obj-file filename))
          (patch (make-instance 'tri-patch
-                               :vertexes (first data)
-                               :indexes (second data))))
+                               :name filename
+                               :given-vs (first data)
+                               :given-is (second data))))
     patch))

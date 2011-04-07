@@ -3,8 +3,10 @@
 Tasks
 
 * DONE Build KD-tree
-** DONE Implement
-** DONE Test 
+** TODO Implement
+*** TODO Triangle acceleration structure
+*** TODO SAH
+** TODO Test
 * TODO KD-Tree traversal
 ** DONE TA-B-rec algorithm
 ** TODO Test the TA-B-rec algorithm
