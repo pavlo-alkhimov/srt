@@ -2,10 +2,10 @@
 
 (defparameter *kd-stack-length* 50)
 (defparameter *nowhere* :no-object)
-(defparameter *default-nil-node* (make-instance 'kd-node))
+(defparameter *default-nil-node* (make-instance 'node))
 
 (defclass stack-element ()
-  ((node :type (or kd-node :no-object)
+  ((node :type (or node :no-object)
          :initform *default-nil-node*)
    (te :initform 0.0
        :type coordinate)
@@ -20,11 +20,11 @@
   (flet ((dump (l element index)
            (if (not (eq *default-nil-node* (slot-value element 'node)))
                (DBG-MSG l "Stack-element[~a]: node=~a. t=~,3f Pb=~a Prev=~a"
-                       index
-                       (slot-value element 'node)
-                       (slot-value element 'te)
-                       (point->string (slot-value element 'pb))
-                       (slot-value element 'prev))
+                        index
+                        (slot-value element 'node)
+                        (slot-value element 'te)
+                        (point->string (slot-value element 'pb))
+                        (slot-value element 'prev))
                (DBG-MSG l "Stack-element[~a]: pointing to nowhere." index))))
     (DBGEXE level
             (let ((prn nil))

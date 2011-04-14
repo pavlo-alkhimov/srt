@@ -9,8 +9,8 @@
                :parse-number
                :iterate
                :alexandria
-               :lispbuilder-sdl
-               :lispbuilder-sdl-gfx)
+               :metabang-bind
+               :lispbuilder-sdl)
   :components
   ((:module packages
             :components

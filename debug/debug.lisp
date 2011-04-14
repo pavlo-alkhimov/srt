@@ -1,6 +1,6 @@
 (in-package #:kd)
 
-(defparameter *Debug-Level* 1)
+(defparameter *Debug-Level* 4)
 (defparameter *current-block* 'top-level)
 
 (defmacro with-dbg-block (name &rest body)
@@ -42,7 +42,9 @@
   `(when (<= ,level *Debug-Level*)
      (progn
        (format t "~a|~a: " ,level *current-block*)
-       (format t ,@body)
+       ,(if (consp body)
+            `(format t ,@body)
+            `(format t ,body))
        (format t "~%"))))
 
 (defmacro dbg-exe (level &rest body)
@@ -74,7 +76,7 @@
        (SET-DBG-LEVEL ,stored-level)
        ,saved-result)))
 
-(defmacro dump (&rest variables)
+(defmacro dump (&rest variables) 
   "Ugly thing..."
   (if variables
       `(,(reduce #'(lambda (x y) (concatenate 'string x y))
@@ -93,7 +95,7 @@
 LEVEL is a verbocity limit;
 FORMAT-GROUP is either:
 1) parameters of the FORMAT
-2) (make-format ....);
+2) (dump ....);
 BODY is... body."
   (with-gensyms (result)
     `(let ((,result))
@@ -113,3 +115,14 @@ BODY is... body."
                 (trimmer (string-downcase (format nil "~a" ',body)))
                 ,result)
        ,result)))
+
+(defmacro dump-many (level format-group)
+  (if (and format-group
+           (car format-group))
+      (append '(progn)
+              (iter (for i in format-group)
+                    (if (eq 'dump
+                            (car i))
+                        (let ((res (macroexpand-1 i)))
+                          (collect `(DBG-MSG ,level ,@res)))
+                        (collect `(DBG-MSG ,level ,@i)))))))

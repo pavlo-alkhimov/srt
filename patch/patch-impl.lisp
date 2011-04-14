@@ -2,7 +2,7 @@
 
 (defun get-coord-by-indexes (patch triangle vertex axis)
   (aref (patch-vs patch)
-        (aref (patch-vis patch)
+        (aref (patch-is patch)
               triangle
               vertex)
         axis))
@@ -11,7 +11,7 @@
   (print-unreadable-object (obj stream :type t :identity t)
     (with-accessors ((name patch-name)
                      (vs patch-vs)
-                     (vi patch-vis)
+                     (vi patch-is)
                      (aabb patch-aabb)
                      (kd-tree patch-kd-tree))
         obj
@@ -27,7 +27,7 @@
           (make-array (list vx-len 3)
                       :element-type 'coordinate
                       :adjustable nil))
-    (setf (patch-vis patch)
+    (setf (patch-is patch)
           (make-array (list ix-len 3)
                       :element-type 'index-type
                       :adjustable nil))
@@ -48,8 +48,13 @@
       (do ((index (car ix) (cdr index))
            (j 0 (1+ j)))
           ((or (> j 2) (not index))) 
-        (setf (aref (patch-vis patch) i j)
+        (setf (aref (patch-is patch) i j)
               (coerce (1- (car index)) 'index-type))))
     ;; aabb
     (setf (patch-aabb patch)
-          (calc-aabb (patch-vs patch)))))
+          (calc-aabb (patch-vs patch)))
+
+    ;; TODO:
+    ;; (setf (patch-tris patch) (make-array 0 :element-type 'triangle))
+    ;; (iter (for i in ))
+    ))

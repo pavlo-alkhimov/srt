@@ -1,43 +1,61 @@
 (in-package #:kd)
 
-(defun calculate-sah-cost (split-pos)
-  ;; float calculatecost( splitpos )
-  ;; {
-  ;;    leftarea = calculateleftarea( splitpos )
-  ;;    rightarea = calculaterightarea( splitpos )
-  ;;    leftcount = calculateleftprimitivecount( splitpos )
-  ;;    rightcount = calculaterightprimitivecount( splitpos )
-  ;;    return costtrav + costintersect * (leftarea * leftcount + rightarea * rightcount)
-  ;; }
-  (let* ((left-area (calculate-area ???))
-         (right-area (calculate-area ???))
-         (left-count (length ???))
-         (right-count (length ???)))
-    (+ *cost-traverse*
-       (* cost-intersect
-          (+ (* left-area left-count)
-             (* right-area right-count))))))
 
-(defun-with-dbg sah (patch aabb axis-index triangles)
+
+(defun get-triangle-bounds (patch triangle axis)
+  (let* ((?0 (get-coord-by-indexes patch triangle 0 axis))
+         (?1 (get-coord-by-indexes patch triangle 1 axis))
+         (?2 (get-coord-by-indexes patch triangle 2 axis)))
+    (values (min ?0 ?1 ?2)
+            (max ?0 ?1 ?2))))
+
+(defun-with-dbg old-sah (patch aabb axis-index triangles)
   (let* ((aabb (corners aabb))
          (div-position  (+ 0.25 (random 0.5))))
     (+ (nth axis-index aabb)
        (* div-position (- (nth (+ 3 axis-index) aabb)
                           (nth axis-index aabb))))))
 
-;; bestpos = -1
-;; bestcost = 1000000
-;; 
-;; for (each primitive in node)
-;; {
-;;    left_extreme = primitive->getleftextreme( axis )
-;;    right_extreme = primitive->getrightextreme( axis )
-;;    if (cost = calculatecost( left_extreme ) < bestcost)
-;;    bestcost = cost, bestpos = left_extreme
-;; 
-;;    if (cost = calculatecost( right_extreme ) < bestcost)
-;;    bestcost = cost, bestpos = right_extreme
-;; }
-;; 
-
-
+(defun-with-dbg sah (patch axis-index triangles)
+  (labels ((calculate-areas (pos)
+             (bind ((LA 0.0)
+                    (RA 0.0)
+                    (LC 0)
+                    (RC 0))
+               (iter (for tri in triangles)
+                     (bind (((L R) (get-triangle-bounds patch tri axis-index))
+                            (S 0.0))))
+               (values (* LA LC)
+                       (* RA RC))))
+           (calculate-sah-cost (split-pos)
+             ;;    leftarea = calculateleftarea( splitpos )
+             ;;    rightarea = calculaterightarea( splitpos )
+             ;;    leftcount = calculateleftprimitivecount( splitpos )
+             ;;    rightcount = calculaterightprimitivecount( splitpos )
+             ;;    return costtrav + costintersect * (leftarea * leftcount + rightarea * rightcount)
+             (bind ((cost-traverse 1.0)
+                    (cost-intersect 1.0)
+                    ((L R) (calculate-areas split-pos)))
+               (+ cost-traverse (* cost-intersect (+ L R))))))
+    ;; It is easier(clearer) to run through all triangles once for coordinates and then,
+    ;; to perform the second run for calculating the corresponding SAH values.
+    (with-dbg 4 (("Calculating SAH initial set."))
+              (let* ((min-pos 0.0)
+                     (min-val 1000000.0))
+                #|(let ((all-sah-values (iter (for i in (sort (iter (for tri in triangles)
+                                                                  (for i from 0 below (length triangles))
+                                                                  (bind (((left-bound right-bound)
+                                                                          (get-triangle-bounds patch tri axis-index)))
+                                                                    (adjoining left-bound)
+                                                                    (adjoining right-bound)))
+                                                            #'<))
+                                            (let ((current-value (calculate-sah-cost i)))
+                                              (adjoining (list i current-value))
+                                              (when (< current-value min-val)
+                                                (setf min-val current-value)
+                                                (setf min-pos i))))))
+                  (values min-pos
+                          min-val
+                all-sah-values))|#
+                (values min-pos
+                        min-val)))))

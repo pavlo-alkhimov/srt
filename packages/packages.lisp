@@ -5,8 +5,8 @@
         #:parse-number
         #:cl-ppcre
         #:alexandria
-        #:lispbuilder-sdl
-        #:lispbuilder-sdl-gfx)
+        #:metabang-bind
+        #:lispbuilder-sdl)
   (:export
    :coordinate :index-type
    :tri-patch :vertexes :indexes :aabb :tree

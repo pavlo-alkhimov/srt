@@ -4,7 +4,9 @@
   
   (set-dbg-level 4)
   
-  (defparameter *test-patch* (load-patch "lisp/development/srt/data/gourd.obj"))
+  ;; (defparameter *test-patch* (load-patch "lisp/development/srt/data/gourd.obj"))
+  (defparameter *test-patch* (load-patch "lisp/development/srt/data/dodecahedron.obj"))
+  
   (defparameter *test-tree* (build-tree *test-patch* :recursion-steps-left 2))
   (setf (slot-value *test-patch* 'kd-tree-root) *test-tree*)
   

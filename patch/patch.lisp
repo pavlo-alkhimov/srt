@@ -1,7 +1,9 @@
 (in-package #:kd)
 
-(defstruct triangle-cached-ref
-  (index 0 :type index-type)
+(defstruct triangle
+  (v0 0 :type index-type)
+  (v1 0 :type index-type)
+  (v2 0 :type index-type)
   (square 0.0 :type coordinate))
 
 (defclass tri-patch ()
@@ -12,13 +14,13 @@
              :initform (make-array '(0 3)
                                    :element-type 'coordinate
                                    :adjustable t))
-   (vertexes-indexes :accessor patch-vis
+   (vertexes-indexes :accessor patch-is
                      :initform (make-array '(0 3)
                                            :element-type 'index-type
                                            :adjustable t))
    (triangles-data :accessor patch-tris
                    :type (array triangle-cached-ref)
-                   :initform (make-array 0 :element-type 'triangle-cached-ref))
+                   :initform (make-array 0 :element-type 'triangle))
    (aabb :accessor patch-aabb
          :type aabb
          :initform (make-instance 'aabb))
