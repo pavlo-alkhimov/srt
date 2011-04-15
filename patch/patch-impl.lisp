@@ -8,17 +8,20 @@
         axis))
 
 (defmethod print-object ((obj tri-patch) stream)
-  (print-unreadable-object (obj stream :type t :identity t)
-    (with-accessors ((name patch-name)
-                     (vs patch-vs)
-                     (vi patch-is)
-                     (aabb patch-aabb)
-                     (kd-tree patch-kd-tree))
-        obj
-      (let* ((vs-len (array-dimension vs 0))
-             (is-len (array-dimension vi 0)))
-        (format stream "Name: ~a~%Vertexes:[~a], Indexes:[~a]~%Bounding box:~a~%Kd:~a."
-                name vs-len is-len aabb kd-tree)))))
+  ;; (print-unreadable-object (obj stream :type t :identity t))
+  (with-accessors ((name patch-name)
+                   (vs patch-vs)
+                   (vi patch-is)
+                   (aabb patch-aabb)
+                   (kd-tree patch-kd-tree)) obj
+    (let* ((vs-len (array-dimension vs 0))
+           (is-len (array-dimension vi 0))
+           (short-name (subseq name
+                               (1+ (or (position #\/ name :from-end t) -1))
+                               (or (position #\. name :from-end t)
+                                   (length name)))))
+      (format stream "#<\"~a\" V(~a) I(~a) AABB:~a ~a>"
+              short-name vs-len is-len aabb (or kd-tree "No kd")))))
 
 (defmethod initialize-instance :after ((patch tri-patch) &key name given-vs given-is)
   (let* ((vx-len (length given-vs))

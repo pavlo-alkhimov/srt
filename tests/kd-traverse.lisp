@@ -1,7 +1,7 @@
 (in-package #:kd)
 
-(with-dbg-block "[TEST] Traverse"
-  
+#|(with-dbg-block "[TEST] Traverse"
+
   (set-dbg-level 4)
   
   ;; (defparameter *test-patch* (load-patch "lisp/development/srt/data/gourd.obj"))
@@ -17,4 +17,4 @@
   (let ((result (ray-trav-alg-rec-b (slot-value *test-patch* 'kd-tree-root)
   (slot-value *test-patch* 'aabb)
   (make-array '(2 3) :initial-contents '((0.0 0.0 0.0)(1.0 2.0 3.0))))))
-  (dbg-msg 1 "Traversing result: ~a" result)))|#)
+  (dbg-msg 1 "Traversing result: ~a" result)))|#)|#

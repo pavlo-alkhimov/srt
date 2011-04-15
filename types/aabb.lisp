@@ -7,13 +7,13 @@
 CORNERS are represented as list (x0 y0 z0 x1 y1 z1)"))
 
 (defmethod print-object ((obj aabb) stream)
-  (print-unreadable-object (obj stream :type t :identity t)
-    (with-accessors ((corners corners)) obj
-      (if corners
-          (format stream "from ~a to ~a"
-                  (point->string corners)
-                  (point->string (cdddr corners)))
-          (format stream "Empty")))))
+  ;; (print-unreadable-object (obj stream :type t :identity t))
+  (with-accessors ((corners corners)) obj
+    (if corners
+        (format stream "#<box ~a-~a>"
+                (point->string corners)
+                (point->string (cdddr corners)))
+        (format stream "#<box: empty>"))))
 
 (defmethod initialize-instance :after ((box aabb) &key from-list)
   (setf (slot-value box 'corners)

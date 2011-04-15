@@ -68,4 +68,4 @@
                
                (sdl:update-display))))))
 
-(draw-xy-kd-tree *test-patch*)
+#|(draw-xy-kd-tree *test-patch*)|#

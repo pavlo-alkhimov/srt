@@ -7,33 +7,32 @@
                :type index-type)
    (left :initarg :l :initform nil :accessor node-left) 
    (right :initarg :r :initform nil :accessor node-right))
-  (:documentation "If both branches are available, it is a node.
-If a the LEFT has something and the RIGHT is nil,
-it is a leaf and the LEFT has the contents of the leaf.
-Otherwise, it is a node."))
+  (:documentation "(and left right) => it is a node.
+(and left (null right)) => it is a leaf
+and the LEFT has the contents of the leaf."))
+
+(defun get-print-list-from-kd-tree (obj)
+  (if (node-left obj)
+      (if (node-right obj)
+          (list :kd-node
+                (case (node-axis obj)
+                  (0 :x) (1 :y) (2 :z))
+                (node-split obj)
+                (get-print-list-from-kd-tree (node-left obj))
+                (get-print-list-from-kd-tree (node-right obj)))
+          (length (node-left obj)))
+      :empty))
 
 (defmethod print-object ((obj node) stream)
-  (print-unreadable-object (obj stream :type t :identity t)
-    (if (node-left obj)
-        (if (node-right obj)
-            (format stream "Node: ~[X~;Y~;Z~]=~,3f. left={~a} right={~a}"
-                    (node-axis obj)
-                    (node-split obj)
-                    (node-left obj)
-                    (node-right obj))
-            (format stream "Leaf: ~[X~;Y~;Z~] [~S]"
-                    (node-axis obj) (length (node-left obj))))
-        (format stream "Empty."))))
+  ;; (print-unreadable-object (obj stream :type t :identity t))
+  (pprint (get-print-list-from-kd-tree obj) stream))
 
 (defun is-leaf (node)
-  (DBG-MSG 10 "(is-leaf ~a) => ~a"
-           node
-           (and node
-                (node-left node)
-                (not (node-right node))))
-  (and node
-       (node-left node)
-       (not (node-right node))))
+  (if node
+      (with-dbg 6 (("(is-leaf ~a)?" node))
+                (and (node-left node)
+                     (null (node-right node))))
+      (error "Tried to execute (is-leaf nil). But nil is not a tree and cannot be checked, sorry.")))
 
 (defun next-axis (axis)
   (mod (1+ axis) 3))

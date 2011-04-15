@@ -1,10 +1,10 @@
 (in-package #:kd)
 
 (defparameter *Debug-Level* 4)
-(defparameter *current-block* 'top-level)
+(defparameter *current-block* "TOP")
 
 (defmacro with-dbg-block (name &rest body)
-  `(let ((*current-block* ',name))
+  `(let ((*current-block* (concatenate 'string *current-block* ">" ,name)))
      ,@body))
 
 (defmacro defun-with-dbg (name args &body body)
@@ -21,12 +21,10 @@
         `(defun ,name ,args
            ,doc-string
            ,decl
-           (let ((*current-block* ',name))
-             ,@body))
+           (with-dbg-block ,(symbol-name name) ,@body))
         `(defun ,name ,args
            ,doc-string
-           (let ((*current-block* ',name))
-             ,@body)))))
+           (with-dbg-block ,(symbol-name name) ,@body)))))
 
 (defun trimmer (string &key (max-len 50))
   (if (> (length string) max-len)
