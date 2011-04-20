@@ -8,7 +8,6 @@
         axis))
 
 (defmethod print-object ((obj tri-patch) stream)
-  ;; (print-unreadable-object (obj stream :type t :identity t))
   (with-accessors ((name patch-name)
                    (vs patch-vs)
                    (vi patch-is)
@@ -56,8 +55,6 @@
     ;; aabb
     (setf (patch-aabb patch)
           (calc-aabb (patch-vs patch)))
-
-    ;; TODO:
-    ;; (setf (patch-tris patch) (make-array 0 :element-type 'triangle))
-    ;; (iter (for i in ))
-    ))
+    
+    (setf (slot-value patch 'kd-tree-root)
+          (build-tree patch))))

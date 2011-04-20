@@ -14,8 +14,7 @@ and the LEFT has the contents of the leaf."))
 (defun get-print-list-from-kd-tree (obj)
   (if (node-left obj)
       (if (node-right obj)
-          (list :kd-node
-                (case (node-axis obj)
+          (list (case (node-axis obj)
                   (0 :x) (1 :y) (2 :z))
                 (node-split obj)
                 (get-print-list-from-kd-tree (node-left obj))
@@ -24,8 +23,12 @@ and the LEFT has the contents of the leaf."))
       :empty))
 
 (defmethod print-object ((obj node) stream)
-  ;; (print-unreadable-object (obj stream :type t :identity t))
-  (pprint (get-print-list-from-kd-tree obj) stream))
+  (let ((res (get-print-list-from-kd-tree obj)))
+    (if (consp res)
+        (progn
+          (format t "KD-TREE:")
+          (pprint res stream))
+        (format t "KD tree leaf with ~a triangle~:p." res))))
 
 (defun is-leaf (node)
   (if node

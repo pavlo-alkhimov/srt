@@ -89,12 +89,6 @@
                    variables))))
 
 (defmacro with-dbg (level format-group &rest body)
-  "Produces a debug output, executes the form and outputs the result.
-LEVEL is a verbocity limit;
-FORMAT-GROUP is either:
-1) parameters of the FORMAT
-2) (dump ....);
-BODY is... body."
   (with-gensyms (result)
     `(let ((,result))
        ,(if (and format-group
@@ -124,3 +118,19 @@ BODY is... body."
                         (let ((res (macroexpand-1 i)))
                           (collect `(DBG-MSG ,level ,@res)))
                         (collect `(DBG-MSG ,level ,@i)))))))
+
+(defmacro with-dbg-header (level format-group &rest body)
+  (with-gensyms (result)
+    `(let ((,result))
+       ,(if (and format-group
+                 (car format-group))
+            (append '(progn)
+                    (iter (for i in format-group)
+                          (if (eq 'dump
+                                  (car i))
+                              (let ((res (macroexpand-1 i)))
+                                (collect `(DBG-MSG ,level ,@res)))
+                              (collect `(DBG-MSG ,level ,@i))))
+                    (list `(setf ,result (progn ,@body))))
+            `(setf ,result (progn ,@body)))
+       ,result)))
