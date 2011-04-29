@@ -1,17 +1,15 @@
 ;; -*- mode: org; indent-tabs-mode: nil -*-
 
-Tasks
-
-* DONE Build KD-tree
-** TODO Implement
-*** TODO Triangle acceleration structure
+* Tasks
+** TODO Build KD-tree
+*** TODO Triangle acceleration structure                           :optional:
 *** TODO SAH
-** TODO Test
-* TODO KD-Tree traversal
-** DONE TA-B-rec algorithm
-** TODO Test the TA-B-rec algorithm
-* TODO ORG-mode
-* TODO Emacs lisp text processing basics
-* DONE Debugging facilities
-** DONE Printing output
-** DONE Conditional evaluation
+*** TODO Test
+** TODO KD-Tree traversal
+*** DONE TA-B-rec algorithm
+*** TODO Test the TA-B-rec algorithm
+** TODO ORG-mode                                                      :later:
+** TODO Emacs lisp text processing basics                             :later:
+** DONE Debugging facilities
+*** DONE Printing output
+*** DONE Conditional evaluation

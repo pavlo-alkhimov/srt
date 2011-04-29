@@ -14,13 +14,13 @@
              :initform (make-array '(0 3)
                                    :element-type 'coordinate
                                    :adjustable t))
-   (vertexes-indexes :accessor patch-is
-                     :initform (make-array '(0 3)
-                                           :element-type 'index-type
-                                           :adjustable t))
-   (triangles-data :accessor patch-tris
-                   :type (array triangle-cached-ref)
-                   :initform (make-array 0 :element-type 'triangle))
+   (indexes :accessor patch-is
+            :initform (make-array '(0 3)
+                                  :element-type 'index-type
+                                  :adjustable t))
+   (squares :accessor patch-sqs
+            :type (array 'coordinate)
+            :initform (make-array 0 :element-type '(array 'coordinate)))
    (aabb :accessor patch-aabb
          :type aabb
          :initform (make-instance 'aabb))

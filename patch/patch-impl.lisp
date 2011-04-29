@@ -18,43 +18,22 @@
            (short-name (subseq name
                                (1+ (or (position #\/ name :from-end t) -1))
                                (or (position #\. name :from-end t)
-                                   (length name)))))
-      (format stream "#<\"~a\" V(~a) I(~a) AABB:~a ~a>"
-              short-name vs-len is-len aabb (or kd-tree "No kd")))))
+                                   (length name))))
+           (*print-lines* 4))
+      (format stream "#<\"~a\"~%~@(~r~) ~:*(~a) vert~:*~[ices~;ex~:;ices~]:" short-name vs-len)
+      (pprint vs)
+      (format stream "~%~@(~r~) ~:*(~a) index~:*~[es~;~:;es~]:" is-len)
+      (pprint vi)
+      (format stream "~%~a~%~a>"
+              aabb (or kd-tree "No kd yet")))))
 
 (defmethod initialize-instance :after ((patch tri-patch) &key name given-vs given-is)
-  (let* ((vx-len (length given-vs))
-         (ix-len (length given-is))) 
-    (setf (patch-vs patch)
-          (make-array (list vx-len 3)
-                      :element-type 'coordinate
-                      :adjustable nil))
-    (setf (patch-is patch)
-          (make-array (list ix-len 3)
-                      :element-type 'index-type
-                      :adjustable nil))
-    (setf (patch-name patch) name)
-    ;; copy vertexes: coerce
-    (do ((v given-vs (cdr v))
-         (i 0 (1+ i)))
-        ((not v))
-      (do ((coord (car v) (cdr coord))
-           (j 0 (1+ j)))
-          ((or (> j 2) (not coord))) 
-        (setf (aref (patch-vs patch) i j)
-              (coerce (car coord) 'coordinate))))
-    ;; copy indexes: 1- and coerce
-    (do ((ix given-is (cdr ix))
-         (i 0 (1+ i)))
-        ((not ix))
-      (do ((index (car ix) (cdr index))
-           (j 0 (1+ j)))
-          ((or (> j 2) (not index))) 
-        (setf (aref (patch-is patch) i j)
-              (coerce (1- (car index)) 'index-type))))
-    ;; aabb
-    (setf (patch-aabb patch)
-          (calc-aabb (patch-vs patch)))
-    
-    (setf (slot-value patch 'kd-tree-root)
-          (build-tree patch))))
+  (setf (patch-name patch) name)
+  (setf (patch-vs patch) (make-array (list (length given-vs) 3)
+                                     :element-type 'coordinate
+                                     :initial-contents given-vs))
+  (setf (patch-is patch) (make-array (list (length given-is) 3)
+                                     :element-type 'index-type
+                                     :initial-contents given-is))
+  (setf (patch-aabb patch) (calc-aabb (patch-vs patch)))
+  (setf (patch-kd-tree patch) (build-tree patch)))

@@ -5,6 +5,7 @@
 (with-dbg-block "[TEST] Traverse"
   
   (set-dbg-level 4)
+  (defparameter *file-name* "lisp/development/srt/data/tetrahedron.obj")
   (defparameter *file-name* "lisp/development/srt/data/dodecahedron.obj")
   
   (setf *test-patch* (load-patch *file-name*))
