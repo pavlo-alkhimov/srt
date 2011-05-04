@@ -6,10 +6,10 @@
   (v2 0 :type index-type)
   (square 0.0 :type coordinate))
 
-(defclass tri-patch ()
+(defclass patch ()
   ((name :accessor patch-name
          :type string
-         :initform "fresh patch")
+         :initform "Fresh empty patch")
    (vertexes :accessor patch-vs
              :initform (make-array '(0 3)
                                    :element-type 'coordinate
@@ -18,12 +18,12 @@
             :initform (make-array '(0 3)
                                   :element-type 'index-type
                                   :adjustable t))
-   (squares :accessor patch-sqs
+   (squares :accessor patch-squares
             :type (array 'coordinate)
             :initform (make-array 0 :element-type '(array 'coordinate)))
    (aabb :accessor patch-aabb
          :type aabb
          :initform (make-instance 'aabb))
    (kd-tree-root :accessor patch-kd-tree
-                 :type (or kd-node null)
+                 :type (or node null)
                  :initform nil)))

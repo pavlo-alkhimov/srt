@@ -18,7 +18,7 @@
                  (current-aabb (if current-aabb-setp
                                    current-aabb
                                    (patch-aabb patch)))
-                 (split-position (old-sah patch current-aabb axis-index triangles))
+                 (split-position (sah patch axis-index triangles))
                  l-triangles
                  r-triangles)
             (dbg-msg 6 "Separate triangles to left and right branches.")

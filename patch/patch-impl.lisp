@@ -7,7 +7,7 @@
               vertex)
         axis))
 
-(defmethod print-object ((obj tri-patch) stream)
+(defmethod print-object ((obj patch) stream)
   (with-accessors ((name patch-name)
                    (vs patch-vs)
                    (vi patch-is)
@@ -27,13 +27,13 @@
       (format stream "~%~a~%~a>"
               aabb (or kd-tree "No kd yet")))))
 
-(defmethod initialize-instance :after ((patch tri-patch) &key name given-vs given-is)
-  (setf (patch-name patch) name)
-  (setf (patch-vs patch) (make-array (list (length given-vs) 3)
+(defmethod initialize-instance :after ((p patch) &key name given-vs given-is)
+  (setf (patch-name p) name)
+  (setf (patch-vs p) (make-array (list (length given-vs) 3)
                                      :element-type 'coordinate
                                      :initial-contents given-vs))
-  (setf (patch-is patch) (make-array (list (length given-is) 3)
+  (setf (patch-is p) (make-array (list (length given-is) 3)
                                      :element-type 'index-type
                                      :initial-contents given-is))
-  (setf (patch-aabb patch) (calc-aabb (patch-vs patch)))
-  (setf (patch-kd-tree patch) (build-tree patch)))
+  (setf (patch-aabb p) (calc-aabb (patch-vs p)))
+  (setf (patch-kd-tree p) (build-tree p)))

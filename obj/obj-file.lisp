@@ -33,8 +33,8 @@
 
 (defun load-patch (filename)
   (let* ((data (parse-obj-file filename))
-         (patch (make-instance 'tri-patch
-                               :name filename
-                               :given-vs (first data)
-                               :given-is (second data))))
-    patch))
+         (p (make-instance 'patch
+                            :name filename
+                            :given-vs (first data)
+                            :given-is (second data))))
+    p))
