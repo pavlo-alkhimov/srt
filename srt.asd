@@ -5,12 +5,17 @@
   :author "Paul Alkhimov <alkhimov@gmail.com>"
   :version "0.0.1"
   :licence "BSD"
-  :depends-on (:cl-ppcre
+  :depends-on (
+               :cl-ppcre
                :parse-number
                :iterate
                :alexandria
                :metabang-bind
-               :lispbuilder-sdl)
+               :cl-opengl
+               :cl-glu
+               :cl-glut
+               ;; :lispbuilder-sdl
+               )
   :components
   ((:module packages
             :components
