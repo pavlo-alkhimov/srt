@@ -58,9 +58,9 @@
                                    (when (< current-value min-val)
                                      (setf min-val current-value)
                                      (setf min-pos position))))))
-      (with-dbg-header 1 ((dump min-pos
-                                min-val
-                                all-sah-values)))
+      ;; (with-dbg-header 3 (("--------------------~%Running on ~a triangles (result is [~,3f,~,3f]"
+      ;;                      (length triangles) min-pos min-val)
+      ;;                     (dump all-sah-values)))
       (values min-pos
               min-val
               all-sah-values))))

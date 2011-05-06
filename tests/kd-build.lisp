@@ -2,7 +2,7 @@
 
 (with-dbg-block "Build test"
   (with-dbg-level 3
-    (let* ((name "lisp/development/srt/data/dodecahedron.obj")
+    (let* ((name "lisp/development/srt/data/gourd.obj")
            (p (load-patch name))
            (result (build-tree p)))
       (if (and p

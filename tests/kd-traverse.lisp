@@ -7,12 +7,13 @@
   (set-dbg-level 4)
   (defparameter *file-name* "lisp/development/srt/data/tetrahedron.obj")
   (defparameter *file-name* "lisp/development/srt/data/dodecahedron.obj")
+  (defparameter *file-name* "lisp/development/srt/data/gourd.obj")
   
   (setf *test-patch* (load-patch *file-name*))
   (dbg-msg 1 "Result: ~a" *test-patch*)
   
-  ;; (defparameter *test-tree* (build-tree *test-patch*))
-  ;; (setf (slot-value *test-patch* 'kd-tree-root) *test-tree*)
+  (defparameter *test-tree* (build-tree *test-patch*))
+  (setf (slot-value *test-patch* 'kd-tree-root) *test-tree*)
   
   
   
