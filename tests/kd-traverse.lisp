@@ -5,9 +5,13 @@
 (with-dbg-block "[TEST] Traverse"
   
   (set-dbg-level 4)
-  (defparameter *file-name* "lisp/development/srt/data/tetrahedron.obj")
-  (defparameter *file-name* "lisp/development/srt/data/dodecahedron.obj")
-  (defparameter *file-name* "lisp/development/srt/data/gourd.obj")
+
+  (defparameter *file-prefix*
+    #+windows "lisp/development/" ;; path provided by LispCabinet + Quicklisp
+    #+darwin "programming/github/" ;; manually created path
+    )
+  (defparameter *file-infix* "srt/data/")
+  (defparameter *file-name* (concatenate 'string *file-prefix* *file-infix* "gourd.obj"))
   
   (setf *test-patch* (load-patch *file-name*))
   (dbg-msg 1 "Result: ~a" *test-patch*)

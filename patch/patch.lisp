@@ -14,6 +14,10 @@
              :initform (make-array '(0 3)
                                    :element-type 'coordinate
                                    :adjustable t))
+   (normals :accessor patch-ns
+            :initform (make-array '(0 3)
+                                  :element-type 'coordinate
+                                  :adjustable t))   
    (indexes :accessor patch-is
             :initform (make-array '(0 3)
                                   :element-type 'index-type

@@ -11,29 +11,34 @@
   (with-accessors ((name patch-name)
                    (vs patch-vs)
                    (vi patch-is)
+                   (ns patch-ns)
                    (aabb patch-aabb)
                    (kd-tree patch-kd-tree)) obj
-    (let* ((vs-len (array-dimension vs 0))
-           (is-len (array-dimension vi 0))
-           (short-name (subseq name
-                               (1+ (or (position #\/ name :from-end t) -1))
-                               (or (position #\. name :from-end t)
-                                   (length name))))
-           (*print-lines* 4))
-      (format stream "#<\"~a\"~%~@(~r~) ~:*(~a) vert~:*~[ices~;ex~:;ices~]:" short-name vs-len)
+    (let* ((*print-lines* 7))
+      (format stream "#<\"~a\"~%~@(~r~) ~:*(~a) vert~:*~[ices~;ex~:;ices~]:"
+              (subseq name
+                      (1+ (or (position #\/ name :from-end t) -1))
+                      (or (position #\. name :from-end t)
+                          (length name)))
+              (array-dimension vs 0))
       (pprint vs)
-      (format stream "~%~@(~r~) ~:*(~a) index~:*~[es~;~:;es~]:" is-len)
+      (format stream "~%~@(~r~) ~:*(~a) normal~:p:" (array-dimension ns 0))
+      (pprint ns)
+      (format stream "~%~@(~r~) ~:*(~a) index~:*~[es~;~:;es~]:" (array-dimension vi 0))
       (pprint vi)
       (format stream "~%~a~%~a>"
               aabb (or kd-tree "No kd yet")))))
 
-(defmethod initialize-instance :after ((p patch) &key name given-vs given-is)
+(defmethod initialize-instance :after ((p patch) &key name given-vs given-is given-ns)
   (setf (patch-name p) name)
   (setf (patch-vs p) (make-array (list (length given-vs) 3)
-                                     :element-type 'coordinate
-                                     :initial-contents given-vs))
+                                 :element-type 'coordinate
+                                 :initial-contents given-vs))
+  (setf (patch-ns p) (make-array (list (length given-ns) 3)
+                                 :element-type 'coordinate
+                                 :initial-contents given-ns))
   (setf (patch-is p) (make-array (list (length given-is) 3)
-                                     :element-type 'index-type
-                                     :initial-contents given-is))
+                                 :element-type 'index-type
+                                 :initial-contents given-is))
   (setf (patch-aabb p) (calc-aabb (patch-vs p)))
   (setf (patch-kd-tree p) (build-tree p)))

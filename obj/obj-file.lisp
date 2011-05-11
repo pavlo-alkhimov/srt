@@ -28,13 +28,15 @@
     (loop for line = (read-line in-stream nil)
        while line
        when (cl-ppcre:scan "^v " line) collect (parse-vertex line 'coordinate) into vertices
+       when (cl-ppcre:scan "^vn " line) collect (parse-vertex line 'coordinate) into normals
        when (cl-ppcre:scan "^f " line) collect (parse-face line) into faces
-       finally (return (list vertices faces)))))
+       finally (return (list vertices faces normals)))))
 
 (defun load-patch (filename)
   (let* ((data (parse-obj-file filename))
          (p (make-instance 'patch
-                            :name filename
-                            :given-vs (first data)
-                            :given-is (second data))))
+                           :name filename
+                           :given-vs (nth 0 data)
+                           :given-is (nth 1 data)
+                           :given-ns (nth 2 data))))
     p))

@@ -1,21 +1,12 @@
 (defpackage #:srt-kd
   (:nicknames :kd)
-  (:use #:cl
-        #:iterate
-        #:parse-number
-        #:cl-ppcre
-        #:alexandria
-        #:metabang-bind
-        ;; #:lispbuilder-sdl
-        #:cffi
-        #:cl-opengl
-        )
-  ;; (:export
-  ;;  :coordinate :index-type
-  ;;  :patch :vertexes :indexes :aabb :tree
-  ;;  :split-aabb
-  ;;  :touches-triangle
-  ;;  :aabb :corners
-  ;;  :node :l :r :split-position
-  ;;  :draw-xy-kd-tree)
-  )
+  (:use :cl
+        :iterate
+        :parse-number
+        :alexandria
+        :cl-ppcre
+        :metabang-bind
+        :cffi
+        :gl)
+  (:shadowing-import-from :iterate #:finish)
+  (:shadowing-import-from :alexandria #:rotate))
