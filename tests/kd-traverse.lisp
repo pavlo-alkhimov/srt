@@ -8,10 +8,11 @@
 
   (defparameter *file-prefix*
     #+windows "lisp/development/" ;; path provided by LispCabinet + Quicklisp
-    #+darwin "programming/github/" ;; manually created path
-    )
+    #+darwin "programming/github/")
   (defparameter *file-infix* "srt/data/")
-  (defparameter *file-name* (concatenate 'string *file-prefix* *file-infix* "gourd.obj"))
+  (defparameter *file* "t2.obj")
+  
+  (defparameter *file-name* (concatenate 'string *file-prefix* *file-infix* *file*))
   
   (setf *test-patch* (load-patch *file-name*))
   (dbg-msg 1 "Result: ~a" *test-patch*)
