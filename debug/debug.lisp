@@ -32,7 +32,9 @@
                               (subseq string 0 max-len)
                               "...")))
         (if (char= (aref string 0) #\()
-            (concatenate 'string res ")")
+            (concatenate 'string
+                         res
+                         ")")
             res))
       string))
 
@@ -74,19 +76,20 @@
        (SET-DBG-LEVEL ,stored-level)
        ,saved-result)))
 
-(defmacro dump (&rest variables) 
-  "Ugly thing..."
-  (if variables
-      `(,(reduce #'(lambda (x y) (concatenate 'string x y))
-                 (mapcar #'(lambda(i) (string-downcase (format nil "~a:~~a  " i)))
-                         variables))
-         ,@(mapcar #'(lambda (x)
-                       `(if (and (listp ,x)
-                                 (numberp (car ,x))
-                                 (< 2 (length ,x)))
-                            (format nil "(~a ~a ~a ...[~a total])" (first ,x) (second ,x) (third ,x) (length ,x))
-                            ,x))
-                   variables))))
+(defmacro dump (&rest variables)
+  (when variables
+    `(,(reduce #'(lambda (x y) (concatenate 'string x y))
+               (mapcar #'(lambda(i) (string-downcase (format nil "~a~~a  " i)))
+                       variables))
+       ,@(mapcar #'(lambda (x)
+                     `(if (listp ,x)
+                          (let ((res (make-array '(0) :element-type 'base-char
+                                                 :fill-pointer 0 :adjustable t)))
+                            (with-output-to-string (s res)
+                              (pprint ,x s))
+                            (concatenate 'string " {pprinted}:" res))
+                          (format nil "=~a" ,x)))
+                 variables))))
 
 (defmacro with-dbg (level format-group &rest body)
   (with-gensyms (result)

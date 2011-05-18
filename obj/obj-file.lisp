@@ -3,40 +3,51 @@
 (defun remove-comment (line)
   (subseq line 0 (position #\# line)))
 
-(defun parse-vertex (line given-type)
+(defun parse-vertex (line)
   (destructuring-bind (label x y z &optional w)
       (cl-ppcre:split "\\s+" (remove-comment line))
     (declare (ignorable label w))
-    (list (coerce (parse-number x) given-type)
-          (coerce (parse-number y) given-type)
-          (coerce (parse-number z) given-type))))
+    (list (coerce (parse-number x) 'coordinate)
+          (coerce (parse-number y) 'coordinate)
+          (coerce (parse-number z) 'coordinate))))
 
 (defun parse-face-point (string)
   (destructuring-bind (vertex-index &optional texture-coordinate normal)
       (cl-ppcre:split "/" string)
     (declare (ignorable texture-coordinate normal))
-    (parse-number vertex-index)))
+    (list (1- (parse-number vertex-index))
+          (when (and texture-coordinate
+                     (< 0 (length texture-coordinate)))
+            (1- (parse-number texture-coordinate)))
+          (when (and normal
+                     (< 0 (length normal)))
+            (1- (parse-number normal))))))
 
 (defun parse-face (line)
   (destructuring-bind (label &rest face-points)
       (cl-ppcre:split "\\s+" (remove-comment line))
     (declare (ignorable label))
-    (map 'list #'(lambda (x) (1- (parse-face-point x))) face-points)))
+    (map 'list #'(lambda (x) (parse-face-point x)) face-points)))
 
 (defun parse-obj-file (filespec)
-  (with-open-file (in-stream filespec :direction :input)
-    (loop for line = (read-line in-stream nil)
-       while line
-       when (cl-ppcre:scan "^v " line) collect (parse-vertex line 'coordinate) into vertices
-       when (cl-ppcre:scan "^vn " line) collect (parse-vertex line 'coordinate) into normals
-       when (cl-ppcre:scan "^f " line) collect (parse-face line) into faces
-       finally (return (list vertices faces normals)))))
+  "I utilize only V, VN and F lines. Others are to be added eventually."
+  (macrolet ((eat (string function container)
+               `(when (cl-ppcre:scan ,string line)
+                  (collect (,function line) into ,container))))
+    (iter (for line in-file filespec using #'read-line)
+          (eat "^v " parse-vertex vertices)
+          (eat "^vn " parse-vertex normals)
+          (eat "^f " parse-face faces)
+          (finally (return (list vertices normals faces))))))
 
-(defun load-patch (filename)
+(defun-with-dbg load-patch (filename)
   (let* ((data (parse-obj-file filename))
-         (p (make-instance 'patch
-                           :name filename
-                           :given-vs (nth 0 data)
-                           :given-is (nth 1 data)
-                           :given-ns (nth 2 data))))
-    p))
+         (*print-lines* 2))
+    (with-dbg 6 ((dump (nth 0 data)) 
+                 (dump (nth 1 data))
+                 (dump (nth 2 data)))
+              (make-instance 'patch
+                             :name filename
+                             :given-vs (nth 0 data)
+                             :given-ns (nth 1 data)
+                             :given-fs (nth 2 data)))))

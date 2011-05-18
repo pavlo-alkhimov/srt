@@ -9,11 +9,13 @@
   (declare (patch patch))
   (gl:shade-model :flat)
   (gl:with-primitives :triangles
-    (dotimes (triangle-index (array-dimension (patch-is patch) 0))
-      (gl:normal (+ (random 0.2) 0.34)
-                 (+ (random 0.2) 0.34)
-                 (+ (random 0.2) 0.34))
+    (dotimes (triangle-index (array-dimension (triangles-indexes-array patch) 0))
       (dotimes (vertex 3)
+        
+        (gl:normal (get-normal-by-indexes patch triangle-index vertex 0)
+                   (get-normal-by-indexes patch triangle-index vertex 1)
+                   (get-normal-by-indexes patch triangle-index vertex 2))
+        
         (gl:vertex (get-coord-by-indexes patch triangle-index vertex 0)
                    (get-coord-by-indexes patch triangle-index vertex 1)
                    (get-coord-by-indexes patch triangle-index vertex 2))))))
@@ -63,7 +65,8 @@
       (gl:rotate view-roty 0 1 0)
       (gl:rotate view-rotz 0 0 1)
       (gl:with-pushed-matrix
-        (gl:translate -3.1 4.2 0.0)
+        ;; (gl:translate -3.1 4.2 0.0)
+        (gl:scale 3.0 3.0 3.0)
         (gl:rotate (- (* -2 angle) 25) 0 0 1)
         (gl:call-list patch)))
     (glut:swap-buffers)

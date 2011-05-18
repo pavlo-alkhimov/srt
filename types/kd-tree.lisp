@@ -28,7 +28,7 @@ and the LEFT has the contents of the leaf."))
         (progn
           (format t "KD-TREE:")
           (pprint res stream))
-        (format t "KD tree leaf with ~a triangle~:p." res))))
+        (format t "KD tree leaf with ~a triangle~:p.~%" res))))
 
 (defun is-leaf (node)
   (if node
