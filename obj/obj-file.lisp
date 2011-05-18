@@ -40,14 +40,21 @@
           (eat "^f " parse-face faces)
           (finally (return (list vertices normals faces))))))
 
-(defun-with-dbg load-patch (filename)
-  (let* ((data (parse-obj-file filename))
-         (*print-lines* 2))
-    (with-dbg 6 ((dump (nth 0 data)) 
-                 (dump (nth 1 data))
-                 (dump (nth 2 data)))
-              (make-instance 'patch
-                             :name filename
-                             :given-vs (nth 0 data)
-                             :given-ns (nth 1 data)
-                             :given-fs (nth 2 data)))))
+(defun-with-dbg load-patch (filename &key (scale 1.0))
+  (let* ((data (parse-obj-file filename)))
+    (setf (nth 0 data)
+          (map 'list
+               #'(lambda (x)(list (* scale (car x))
+                                  (* scale (cadr x))
+                                  (* scale (caddr x))))
+               (nth 0 data)))
+    (make-instance 'patch
+                   :name filename
+                   :given-vs (nth 0 data)
+                   :given-ns (nth 1 data)
+                   :given-fs (nth 2 data))))
+
+
+
+
+

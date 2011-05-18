@@ -21,25 +21,25 @@
                    (LeftArea  0.0)
                    (RightArea 0.0)
                    (LeftCount  0)
-                   (RightCount 0))
+                   (RightCount 0)
+                   (counter 0))
                (dolist (tri triangles)
-                 (multiple-value-bind (L R) (get-triangle-bounds patch tri axis-index) 
-                   (if (> L pos)
-                       (progn ;; rightside
-                         (incf RightArea 1.0)
-                         (incf RightCount))
-                       (if (< R pos)
-                           (progn ;; leftside
-                             (incf LeftArea 1.0)
-                             (incf LeftCount))
-                           (progn ;; both sides
-                             (incf RightArea 1.0)
-                             (incf LeftArea 1.0)
-                             (incf RightCount)
-                             (incf LeftCount))))))
-               (dbg-msg 6
-                        (dump LeftArea LeftCount)
-                        (dump RightArea RightCount))
+                 (multiple-value-bind (L R) (get-triangle-bounds patch tri axis-index)
+                   (let ((squa (aref (squares patch) counter)))
+                     (incf counter)
+                     (if (> L pos)
+                         (progn ;; rightside
+                           (incf RightArea squa)
+                           (incf RightCount))
+                         (if (< R pos)
+                             (progn ;; leftside
+                               (incf LeftArea squa)
+                               (incf LeftCount))
+                             (progn ;; both sides
+                               (incf RightArea squa)
+                               (incf LeftArea squa)
+                               (incf RightCount)
+                               (incf LeftCount)))))))
                (+ CostTrav
                   (* CostIntersect
                      (+ (* LeftArea LeftCount)
@@ -58,9 +58,11 @@
                                    (when (< current-value min-val)
                                      (setf min-val current-value)
                                      (setf min-pos position))))))
+
       ;; (with-dbg-header 3 (("--------------------~%Running on ~a triangles (result is [~,3f,~,3f]"
       ;;                      (length triangles) min-pos min-val)
       ;;                     (dump all-sah-values)))
+      
       (values min-pos
               min-val
               all-sah-values))))

@@ -3,7 +3,7 @@
 (defun-with-dbg build-tree (patch &key (triangles nil triangles-setp)
                                   (current-aabb nil current-aabb-setp)
                                   (axis-index 0)
-                                  (recursion-steps-left 1)
+                                  (recursion-steps-left 0)
                                   (min-triangles-count 3))
   (declare (optimize (debug 3))
            (type (or null aabb) current-aabb))
@@ -56,6 +56,6 @@
                     (with-dbg-header 5 (("Create the leaf without any recursion."))
                                      (make-instance 'node :l triangles)))))))
       (with-dbg-header 5 (("Recursion ended, creating the leaf with ~a triangles." (length triangles)))
-                       (if triangles
-                           (make-instance 'node :l triangles)
-                           (dbg-msg 0 "ERROR: TRIANGLES-LIST is empty. Should never reach this logical branch.")))))
+                       (when (null triangles)
+                         (dbg-msg 0 "ERROR: TRIANGLES-LIST is empty. Should never reach this logical branch."))
+                       (make-instance 'node :l triangles))))
