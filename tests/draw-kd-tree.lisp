@@ -7,7 +7,7 @@
 (defun draw-patch (patch)
   "Draw a patch."
   (declare (patch patch))
-  (gl:shade-model :flat)
+  (gl:shade-model :smooth)
   (gl:with-primitives :triangles
     (dotimes (triangle-index (array-dimension (triangles-indexes-array patch) 0))
       (dotimes (vertex 3)
@@ -36,6 +36,7 @@
     (setq patch (gl:gen-lists 1))
     (gl:with-new-list (patch :compile)
       (gl:material :front :ambient-and-diffuse #(0.2 0.2 1.0 1.0)) ; blue
+
       (draw-patch *test-patch*))
     (gl:enable :normalize)))
 
