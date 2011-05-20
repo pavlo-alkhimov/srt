@@ -1,9 +1,11 @@
 ;; -*- mode: org; indent-tabs-mode: nil -*-
 
+blog: http://lisp-raytracer.blogspot.com/
+
 * Tasks
 ** TODO Build KD-tree
-*** TODO Triangle acceleration structure                           :optional:
-*** TODO SAH
+*** DONE Triangle acceleration structure                           :optional:
+*** DONE SAH
 *** TODO Test
 ** TODO KD-Tree traversal
 *** DONE TA-B-rec algorithm
